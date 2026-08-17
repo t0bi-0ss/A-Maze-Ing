@@ -6,6 +6,7 @@ from pydantic import ValidationError, BaseModel, Field, model_validator
 
 from typing_extensions import Self
 
+from typing import Literal
 
 """
 Pending DocString
@@ -28,6 +29,7 @@ class MazeConfiguration(BaseModel):
     )
     perfect: bool = False
     seed: str | int | float | bytes | None = None
+    algorithm: Literal["prism", "backtracking", "hybrid"] = Field(default=None)
 
     @model_validator(mode="after")
     def validate_configuration(self) -> Self:
@@ -83,7 +85,8 @@ class MazeConfiguration(BaseModel):
             f"Exit: {self.exit}\n" \
             f"Output file: {self.output_file}\n" \
             f"Perfect: {self.perfect}\n" \
-            f"Seed: {self.seed}"
+            f"Seed: {self.seed}\n" \
+            f"Algorithm: {self.algorithm}"
 
 
 def get_config(config_file: str) -> MazeConfiguration:
@@ -109,6 +112,12 @@ def get_config(config_file: str) -> MazeConfiguration:
 
     config_vars = dict(parser['TOP'])
 
+    if 'algorithm' not in config_vars:
+        config_vars['algorithm'] = 'hybrid'
+
+    if 'seed' not in config_vars:
+        config_vars['seed'] = None
+
     for key in ['width', 'height']:
         try:
             int(config_vars[key])
@@ -123,7 +132,9 @@ def get_config(config_file: str) -> MazeConfiguration:
             entry=config_vars['entry'].replace(" ", ""),
             exit=config_vars['exit'].replace(" ", ""),
             output_file=config_vars['output_file'],
-            perfect=parser.getboolean('TOP', 'perfect')
+            perfect=parser.getboolean('TOP', 'perfect'),
+            algorithm=config_vars['algorithm'],
+            seed=config_vars['seed']
         )
     except KeyError as msg:
         print(f"KeyError: key {msg} is missing from config file")
