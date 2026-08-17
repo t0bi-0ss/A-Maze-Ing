@@ -1,4 +1,4 @@
-from configparser import ConfigParser
+from configparser import ConfigParser, ParsingError
 
 import sys
 
@@ -105,8 +105,12 @@ def get_config(config_file: str) -> MazeConfiguration:
             OSError,
             PermissionError,
             IsADirectoryError,
-            FileNotFoundError
+            FileNotFoundError,
     ) as msg:
+        print(msg)
+        sys.exit()
+    except ParsingError as msg:
+        print("ERROR: invalid syntax for 'config' file")
         print(msg)
         sys.exit()
 
