@@ -2,8 +2,6 @@
 Holds MazeGenerator class
 """
 
-from collections.abc import Callable
-
 import random
 
 
@@ -136,12 +134,25 @@ class MazeGenerator():
         self.maze = [[15 for col in range(0, self.WIDTH)]
                      for row in range(0, self.HEIGHT)]
         self.valid_coordinates = self.valid_list()
+        self.visited = []
 
     # VALID coordinates list
     def valid_list(self) -> list[tuple[int, int]]:
         """
         Creates a list of 'valid' coordinates
-        """
+        """def random_cell(
+#         cells: list[MazeCell],
+# ) -> MazeCell:
+#     """
+#     Returns a non 'static' cell randomly selected from 'cells'
+#     """
+
+#     cell = cells[random.randint(0, len(cells) - 1)]
+
+#     if cell.static:
+#         return random_cell(cells)
+#     else:
+#         return cell
 
         valid_coordinates = []
         for row in range(0, self.HEIGHT):
@@ -150,17 +161,53 @@ class MazeGenerator():
                     valid_coordinates.append((row, col))
 
         return valid_coordinates
+def random_cell(
+#         cells: list[MazeCell],
+# ) -> MazeCell:
+#     """
+#     Returns a non 'static' cell randomly selected from 'cells'
+#     """
 
+#     cell = cells[random.randint(0, len(cells) - 1)]
+
+#     if cell.static:
+#         return random_cell(cells)
+#     else:
+#         return cell
     # Define pattern cells
     def pattern_setter(self) -> None:
         """
         Sets 'pattern' cells if possible
         """
+def random_cell(
+#         cells: list[MazeCell],
+# ) -> MazeCell:
+#     """
+#     Returns a non 'static' cell randomly selected from 'cells'
+#     """
 
+#     cell = cells[random.randint(0, len(cells) - 1)]
+
+#     if cell.static:
+#         return random_cell(cells)
+#     else:
+#         return cell
         if self.WIDTH >= 9 and self.HEIGHT >= 7:
             center = (round(self.HEIGHT / 2), round(self.WIDTH / 2))
             four_top_left = tuple(map(sum, zip(center, (-2, -3))))
-            two_top_left = tuple(map(sum, zip(center, (-2, 1))))
+            two_top_leftdef random_cell(
+#         cells: list[MazeCell],
+# ) -> MazeCell:
+#     """
+#     Returns a non 'static' cell randomly selected from 'cells'
+#     """
+
+#     cell = cells[random.randint(0, len(cells) - 1)]
+
+#     if cell.static:
+#         return random_cell(cells)
+#     else:
+#         return cell = tuple(map(sum, zip(center, (-2, 1))))
 
             def three_down(
                     starting_coordinates: tuple[int, int],
@@ -169,22 +216,37 @@ class MazeGenerator():
                 x = starting_coordinates[0]
                 y = starting_coordinates[1]
                 for i in range(0, 3):
-                    maze[x + i][y] = 16
+                    mazedef random_cell(
+#         cells: list[MazeCell],
+# ) -> MazeCell:
+#     """
+#     Returns a non 'static' cell randomly selected from 'cells'
+#     """
+
+#     cell = cells[random.randint(0, len(cells) - 1)]
+
+#     if cell.static:
+#         return random_cell(cells)
+#     else:
+#         return cell[x + i][y] = 16
             three_down()
         else:
             print("ERROR: maze size is not big enough to hold '42' pattern")
 
 
-def random_cell(
-        cells: list[MazeCell],
-) -> MazeCell:
-    """
-    Returns a non 'static' cell randomly selected from 'cells'
-    """
+# def random_cell(
+#         cells: list[MazeCell],
+# ) -> MazeCell:
+#     """
+#     Returns a non 'static' cell randomly selected from 'cells'
+#     """
 
-    cell = cells[random.randint(0, len(cells) - 1)]
+#     cell = cells[random.randint(0, len(cells) - 1)]
 
-    if cell.static:
-        return random_cell(cells)
-    else:
-        return cell
+#     if cell.static:
+#         return random_cell(cells)
+#     else:
+#         return cell
+
+
+    def gen_maze()
