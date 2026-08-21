@@ -16,12 +16,6 @@ class EmptyVisitedList(Exception):
     Exception in case of an empty 'visited' list
     """
 
-    def __init__(self) -> None:
-        self.message = "Visited List is empty"
-
-    def __str__(self) -> str:
-        return self.message
-
 
 class InvalidNeighborIndex(Exception):
     """
@@ -106,7 +100,7 @@ def _select_from_visited(visited: list[MazeCell], selector: float) -> MazeCell:
         return _select_from_visited(visited, stochastic_round(selector))
 
 
-def move_index(
+def _check_neighbors_index(
         c_cell_index: int,
         dir: Directions,
         maze_width: int,
@@ -135,10 +129,11 @@ def move_index(
                 neighbors_index -= 1
 
     if neighbors_index < 0:
-        raise 
+        raise InvalidNeighborIndex
+    return neighbors_index
 
 
-def neighbor_validator(cell: MazeCell, maze: Maze, dir: Directions) -> MazeCell:
+def neighbor_validator(maze: MazeCell, neighbors_index: int) -> MazeCell:
     """
     Returns cell's neighbor cell in 'dir' direction if it's valid
     """
