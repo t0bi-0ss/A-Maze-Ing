@@ -116,8 +116,8 @@ def _select_from_visited(visited: list[MazeCell], selector: float) -> MazeCell:
         """
         return 0 if random.random() < num else 1
 
-    # if len(visited) == 0:
-    #     raise EmptyVisitedList
+    if len(visited) == 0:
+        raise EmptyVisitedList
     if selector == 1:
         return random.choice(visited)
     elif selector == 0:
@@ -271,6 +271,9 @@ def _move_forward(
         _connect_neighbor(current_cell, maze, maze_width, maze_height, visited)
     except DeadEnd:
         visited.remove(current_cell)
+        _move_forward(visited, maze, maze_width, maze_height, selector)
+    except EmptyVisitedList:
+        return
 
 
 def _print_maze(maze: Maze, width: int):
