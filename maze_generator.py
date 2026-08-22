@@ -52,6 +52,12 @@ class MazeCell():
         self.static = False
         self.is_visited = False
 
+    def is_now_static(self) -> None:
+        """
+        Switches static attribute to True
+        """
+        self.static = True
+
     def is_now_visited(self) -> None:
         """
         Switches is_visited attribute to True
@@ -100,7 +106,6 @@ def _starting_cell(maze: Maze) -> MazeCell:
     if cell.static:
         cell = _starting_cell(maze)
     cell.is_now_visited()
-    print("Starting cell index = ", maze.index(cell))
     return cell
 
 
@@ -124,6 +129,26 @@ def _select_from_visited(visited: list[MazeCell], selector: float) -> MazeCell:
         return visited[-1]
     else:
         return _select_from_visited(visited, stochastic_round(selector))
+
+
+def get_neighbors_index(
+        c_cell_index: int,
+        dir: Directions,
+        maze_width: int,
+) -> int:
+    """
+    Returns neighbors index in specified direction
+    """
+
+    match dir.value:
+        case 'N':
+            return c_cell_index - maze_width
+        case 'E':
+            return c_cell_index + 1
+        case 'S':
+            return c_cell_index + maze_width
+        case 'W':
+            return c_cell_index - 1
 
 
 def _validate_direction(
@@ -249,9 +274,6 @@ def _connect_neighbor(
         neighbor_cell.is_now_visited()
         visited_list.append(neighbor_cell)
         dir = dir_and_neighbor[0]
-        # print(f"Current_cell index = {current_cell.INDEX}")
-        # print(f"Neighbor_cell index = {neighbor_cell.INDEX}")
-        # print(f"Direction = {dir}")
         _build_path(current_cell, neighbor_cell, dir)
 
 
@@ -276,17 +298,82 @@ def _move_forward(
         return
 
 
-def _print_maze(maze: Maze, width: int):
-    print()
-    counter = 1
-    for cel in maze:
-        print(cel.walls, end="")
-        if counter != width:
-            print(", ", end="")
-            counter += 1
-        else:
-            print()
-            counter = 1
+def _set_static_sequence(
+        maze: Maze,
+        maze_width: int,
+        starting_index: int,
+        dir: Directions,
+        cells_number: int
+) -> None:
+    """
+    Sets a number of cells to static in a specific direction and returns last
+    index in the sequence
+    """
+
+    current_index = starting_index
+    maze[current_index].is_now_static()
+    for i in range(0, cells_number - 1):
+        current_index = get_neighbors_index(current_index, dir, maze_width)
+        maze[current_index].is_now_static()
+    return current_index
+
+
+def _set_four_pattern(maze: Maze, maze_width: int) -> None:
+    """Sets the 'four' on the '42' pattern"""
+
+    maze_center = round(len(maze) / 2)
+    starting_index = maze_center - maze_width * 2 - 3
+    # 3 cells down
+    starting_index = _set_static_sequence(
+        maze, maze_width, starting_index, Directions.SOUTH, 3
+        )
+    # 3 cells to the right
+    starting_index = _set_static_sequence(
+        maze, maze_width, starting_index, Directions.EAST, 3
+        )
+    # 3 cells down
+    starting_index = _set_static_sequence(
+        maze, maze_width, starting_index, Directions.SOUTH, 3
+        )
+
+
+def _set_two_pattern(maze: Maze, maze_width: int) -> None:
+    """
+    Sets the 'two' on the '42' pattern
+    """
+
+    maze_center = round(len(maze) / 2)
+    starting_index = maze_center - maze_width * 2 + 1
+    # 3 cells to the right
+    starting_index = _set_static_sequence(
+        maze, maze_width, starting_index, Directions.EAST, 3
+        )
+    # 3 cells down
+    starting_index = _set_static_sequence(
+        maze, maze_width, starting_index, Directions.SOUTH, 3
+        )
+    # 3 cells to the left
+    starting_index = _set_static_sequence(
+        maze, maze_width, starting_index, Directions.WEST, 3
+        )
+    # 3 cells down
+    starting_index = _set_static_sequence(
+        maze, maze_width, starting_index, Directions.SOUTH, 3
+        )
+    # 3 cells to the right
+    starting_index = _set_static_sequence(
+        maze, maze_width, starting_index, Directions.EAST, 3
+        )
+
+
+def _pattern(maze: Maze, maze_width: int, maze_height: int) -> None:
+    """Sets '42' pattern in the maze if possible"""
+
+    if maze_width < 9 or maze_height < 8:
+        print("ERROR: maze is not big enough to hold the '42' pattern")
+        return
+    _set_two_pattern(maze, maze_width)
+    _set_four_pattern(maze, maze_width)
 
 
 class MazeGenerator():
@@ -315,6 +402,7 @@ class MazeGenerator():
         self.SEED = seed
         self.maze = [MazeCell(element_num) for element_num
                      in range(0, self.WIDTH * self.HEIGHT)]
+        _pattern(self.maze, self.WIDTH, self.HEIGHT)
         self.generator = self.gen_maze
 
     def gen_maze(self) -> Maze:
@@ -351,24 +439,25 @@ def to_hex(num):
         case _:
             return str(num)
 
+
 if __name__ == "__main__":
 
-    maze = MazeGenerator(9, 9, (0, 0), (3, 3), 0, True)
+    maze = MazeGenerator(9, 9, (0, 0), (3, 3), 0.75, True)
 
     from collections import deque
 
-    counter = 1
-    for _ in maze.generator():
-        for val in _:
-            print(to_hex(val.walls), end="")
-            if counter == 9:
-                counter = 1
-                print()
-                continue
-            counter += 1
-        print()
+    # counter = 1
+    # for _ in maze.generator():
+    #     for val in _:
+    #         print(to_hex(val.walls), end="")
+    #         if counter == 9:
+    #             counter = 1
+    #             print()
+    #             continue
+    #         counter += 1
+    #     print()
     # Exhaust the generator instantly
-    # deque(maze.generator(), maxlen=0)
+    deque(maze.generator(), maxlen=0)
     counter = 1
     final = ""
     for _ in maze.maze:
@@ -379,7 +468,6 @@ if __name__ == "__main__":
             continue
         counter += 1
     # print(final)
-    print(maze.maze[-1].INDEX)
 
     with open('maze.txt', 'w') as f:
         f.write(final)
