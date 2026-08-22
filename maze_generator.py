@@ -357,8 +357,18 @@ if __name__ == "__main__":
 
     from collections import deque
 
+    counter = 1
+    for _ in maze.generator():
+        for val in _:
+            print(to_hex(val.walls), end="")
+            if counter == 9:
+                counter = 1
+                print()
+                continue
+            counter += 1
+        print()
     # Exhaust the generator instantly
-    deque(maze.generator(), maxlen=0)
+    # deque(maze.generator(), maxlen=0)
     counter = 1
     final = ""
     for _ in maze.maze:
@@ -368,7 +378,7 @@ if __name__ == "__main__":
             final += "\n"
             continue
         counter += 1
-    print(final)
+    # print(final)
     print(maze.maze[-1].INDEX)
 
     with open('maze.txt', 'w') as f:
