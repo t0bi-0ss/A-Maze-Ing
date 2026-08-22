@@ -402,7 +402,7 @@ def _pattern(
     if maze_width < 9 or maze_height < 8:
         print("ERROR: maze is not big enough to hold the '42' pattern")
         return
-    if maze_width % 2 == 0 or maze_height % 2 == 0 and perfect_centered:
+    if (maze_width % 2 == 0 or maze_height % 2 == 0) and perfect_centered:
         print(
             "ERROR: either width or center is not odd so '42' could not be"
             " perfectly centered"
