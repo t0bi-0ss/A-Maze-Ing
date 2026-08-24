@@ -6,6 +6,10 @@ from .center_pattern import pattern
 
 from .gen_algorithms import growing_tree
 
+from collections.abc import Generator
+
+from .dead_end_deleter import dead_end_deleter
+
 import sys
 
 
@@ -53,7 +57,7 @@ class MazeGenerator:
         pattern(self.maze, self.WIDTH, self.HEIGHT, self.PCENTERED)
         self.generator = self.gen_maze
 
-    def gen_maze(self) -> Maze:
+    def gen_maze(self) -> Generator[Maze, None, None]:
         """
         Returns a Maze generator
         """
@@ -68,6 +72,9 @@ class MazeGenerator:
                 self.HEIGHT,
                 self.SELECTOR
             )
+        if not self.PERFECT:
+            dead_end_deleter(self.maze, self.WIDTH, self.HEIGHT)
+            yield self.maze
 
     def transcript(self, output_file_name: str):
         """
