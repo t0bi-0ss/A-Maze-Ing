@@ -1,9 +1,10 @@
 from maze_generator import MazeGenerator
 
-
 if __name__ == "__main__":
 
-    maze = MazeGenerator(15, 15, (0, 0), (3, 3), 0.75, True)
+    maze = MazeGenerator(
+        15, 15, (0, 0), (3, 3), 0.75, perfect=False, perfect_centered=True
+        )
 
     from collections import deque
 
@@ -19,5 +20,4 @@ if __name__ == "__main__":
     #     print()
     # Exhaust the generator instantly
     deque(maze.generator(), maxlen=0)
-    counter = 1
     maze.transcript("maze.txt")

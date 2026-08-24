@@ -26,28 +26,32 @@ class MazeCell():
         Deletes 'North' wall
         """
 
-        self.walls = self.walls ^ 1
+        if self.walls & 1:
+            self.walls = self.walls ^ 1
 
     def del_east(self) -> None:
         """
         Deletes 'East' wall
         """
 
-        self.walls = self.walls ^ 2
+        if self.walls & 2:
+            self.walls = self.walls ^ 2
 
     def del_south(self) -> None:
         """
         Deletes 'South' wall
         """
 
-        self.walls = self.walls ^ 4
+        if self.walls & 4:
+            self.walls = self.walls ^ 4
 
     def del_west(self) -> None:
         """
         Deletes 'West' wall
         """
 
-        self.walls = self.walls ^ 8
+        if self.walls & 8:
+            self.walls = self.walls ^ 8
 
 
 Maze = list[MazeCell]

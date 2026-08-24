@@ -5,7 +5,7 @@ from ..mazecell import MazeCell, Maze
 import random
 
 from ..exceptions import EmptyVisitedList, \
-    InvalidDirection, InvalidNeighbor, DeadEnd, NoValidNeighbors
+    InvalidDirection, InvalidNeighbor, NoValidNeighbors
 
 
 def _select_from_visited(visited: list[MazeCell], selector: float) -> MazeCell:
@@ -104,7 +104,7 @@ def _connect_neighbor(
         maze_width: int,
         maze_height: int,
         visited_list: list[MazeCell]
-) -> None:
+) -> int:
     """
     Connects 'cell' with one of it's neighbors if possible
     """
@@ -114,13 +114,14 @@ def _connect_neighbor(
             current_cell, maze, maze_width, maze_height
             )
     except NoValidNeighbors:
-        raise DeadEnd
+        return 0
     else:
         neighbor_cell = dir_and_neighbor[1]
         neighbor_cell.is_now_visited()
         visited_list.append(neighbor_cell)
         dir = dir_and_neighbor[0]
         _build_path(current_cell, neighbor_cell, dir)
+        return 1
 
 
 def growing_tree(
@@ -134,11 +135,15 @@ def growing_tree(
     Builds next path bewteen cells if possible
     """
 
+    could_connect = 0
+
     try:
-        current_cell = _select_from_visited(visited, selector)
-        _connect_neighbor(current_cell, maze, maze_width, maze_height, visited)
-    except DeadEnd:
-        visited.remove(current_cell)
-        growing_tree(visited, maze, maze_width, maze_height, selector)
+        while not could_connect:
+            current_cell = _select_from_visited(visited, selector)
+            could_connect = _connect_neighbor(
+                current_cell, maze, maze_width, maze_height, visited
+            )
+            if not could_connect:
+                visited.remove(current_cell)
     except EmptyVisitedList:
         return
