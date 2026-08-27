@@ -3,6 +3,11 @@ import sys
 from maze_generator import Maze
 
 
+def _get_pos(dir: tuple[str, str]) -> str:
+    res = str(dir[0]).replace(' ', '') + ',' + str(dir[1]).replace(' ', '')
+    return res
+
+
 def transcripter(maze: Maze, output_file_name: str, solution: str = None):
     """
     Transcripts all MazeCell's walls value in maze into a text file
@@ -40,8 +45,10 @@ def transcripter(maze: Maze, output_file_name: str, solution: str = None):
 
     # Pass entry and exit
     res += "\n\n"
-    res += f"{maze.ENTRY[0]},{maze.ENTRY[1]}\t\t# entry\t(x,y)\n"
-    res += f"{maze.EXIT[0]},{maze.EXIT[1]}\t\t# exit\t(x,y)\n"
+    entry = _get_pos(maze.ENTRY)
+    exit = _get_pos(maze.EXIT)
+    res += f"{entry}\t\t# entry\t(x,y)\n"
+    res += f"{exit}\t\t# exit\t(x,y)\n"
 
     # Pass solution
     if solution:

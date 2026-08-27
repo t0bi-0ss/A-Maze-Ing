@@ -24,14 +24,14 @@ def _select_from_visited(
 
     if len(visited) == 0:
         raise EmptyVisitedList
+    if selector == -1:
+        selector = rng.random()
+    if 0 < selector < 1:
+        selector = stochastic_round(selector, rng)
     if selector == 1:
         return rng.choice(visited)
     elif selector == 0:
         return visited[-1]
-    else:
-        return _select_from_visited(
-            visited, stochastic_round(selector, rng), rng
-            )
 
 
 def _neighbor_validator(maze: Maze, neighbors_index: int) -> MazeCell:

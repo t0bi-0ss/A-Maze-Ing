@@ -2,10 +2,10 @@
 # optional keys: seed, algorithm, display mode
 
 WIDTH = 20
-height ; 10
+height = 10
 entry = 1, 2
 EXIT = 2,3
 output_file = 15555
 perfect = 1
-seed = 2
-algorithm = p
+# seed = 2
+algorithm = gt

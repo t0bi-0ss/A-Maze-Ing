@@ -20,8 +20,8 @@ class MazeConfiguration(BaseModel):
 
     width: int = Field(gt=2, le=42)
     height: int = Field(gt=2, le=42)
-    entry: str = Field(min_length=3)
-    exit: str = Field(min_length=3)
+    entry: tuple[str, str]
+    exit: tuple[str, str]
     output_file: str = Field(
         min_length=5,
         max_length=260,
@@ -39,26 +39,19 @@ class MazeConfiguration(BaseModel):
         """
 
         try:
-            assert self.exit.split(',') != self.entry.split(',')
+            assert self.exit != self.entry
         except AssertionError:
             raise AssertionError(
                 "ERROR: 'ENTRY' and 'EXIT' coordinates must be different"
             )
 
-        def validate_pos(pos: str, name: str) -> None:
+        def validate_pos(pos: tuple[str, str], name: str) -> None:
             """
             validates both 'entry' and 'exit' formats
             """
 
-            pos_list = pos.split(",")
-            if len(pos_list) != 2:
-                raise ValueError(
-                    f"{name} must be two integers (ONLY)"
-                    " separated by a SINGLE comma"
-                )
-
             # Check if either of it's elements are not an int or negative
-            for item in pos_list:
+            for item in pos:
                 try:
                     assert int(item) >= 0
                 except ValueError as msg:
@@ -72,7 +65,7 @@ class MazeConfiguration(BaseModel):
                     )
 
             # Check if either of it's elements exceeds maze boundaries
-            for item in pos_list:
+            for item in pos:
                 try:
                     assert self.height > int(item)
                     assert self.width > int(item)
@@ -99,7 +92,8 @@ class MazeConfiguration(BaseModel):
             f"Output file: {self.output_file}\n" \
             f"Perfect: {self.perfect}\n" \
             f"Seed: {self.seed}\n" \
-            f"Algorithm: {self.algorithm}"
+            f"Algorithm: {self.algorithm}\n" \
+            f"Perfect centered: {self.perfect_centered}"
 
 
 def get_config(config_file: str) -> MazeConfiguration:
@@ -143,29 +137,25 @@ def get_config(config_file: str) -> MazeConfiguration:
             sys.exit()
 
     if 'perfect_centered' not in config_vars:
-        config_vars['perfect_centered'] = True
+        parser['TOP']['perfect_centered'] = 'True'
 
     try:
         maze_config = MazeConfiguration(
             width=int(config_vars['width']),
             height=int(config_vars['height']),
-            entry=config_vars['entry'].replace(" ", ""),
-            exit=config_vars['exit'].replace(" ", ""),
+            entry=config_vars['entry'].split(','),
+            exit=config_vars['exit'].split(','),
             output_file=config_vars['output_file'],
             perfect=parser.getboolean('TOP', 'perfect'),
             algorithm=config_vars['algorithm'],
             seed=config_vars['seed'],
-            perfect_centered=parser.getboolean['TOP', 'perfect_centered']
+            perfect_centered=parser.getboolean('TOP', 'perfect_centered')
         )
     except KeyError as msg:
         print(f"KeyError: key {msg} is missing from config file")
         sys.exit()
     except ValidationError as msg:
-        print(
-            f"ERROR in '{str(msg.errors()[0]['loc'][0])}' config parameter: ",
-            end=""
-        )
-        print(str(msg.errors()[0]['msg']))
+        print(msg.errors()[0]['msg'])
         sys.exit()
     except ValueError as msg:
         print("ERROR: 'PERFECT' or 'PERFECT_CENTERED' parameter:", msg)

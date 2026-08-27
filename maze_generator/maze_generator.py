@@ -37,7 +37,7 @@ class MazeGenerator:
             height: int,
             entry: tuple[int, int],
             exit: tuple[int, int],
-            selector: float,
+            selector: float = -1,
             perfect: bool = False,
             seed: int | float |
             str | bytes |
