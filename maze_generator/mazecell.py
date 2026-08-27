@@ -8,6 +8,7 @@ class MazeCell():
         self.walls = 15
         self.static = False
         self.is_visited = False
+        self.distance_to_entrance = -1
 
     def is_now_static(self) -> None:
         """
