@@ -8,26 +8,30 @@ from ..exceptions import EmptyVisitedList, \
     InvalidDirection, InvalidNeighbor, NoValidNeighbors
 
 
-def _select_from_visited(visited: list[MazeCell], selector: float) -> MazeCell:
+def _select_from_visited(
+        visited: list[MazeCell], selector: float, rng: random.Random
+) -> MazeCell:
     """
     Selects a cell from 'visited' list according to 'selector'
     """
 
-    def stochastic_round(num: float) -> int:
+    def stochastic_round(num: float, rng: random.Random) -> int:
         """
         Returns num rounded up or down being it's proper value the chance for
         either case
         """
-        return 0 if random.random() < num else 1
+        return 0 if rng.random() < num else 1
 
     if len(visited) == 0:
         raise EmptyVisitedList
     if selector == 1:
-        return random.choice(visited)
+        return rng.choice(visited)
     elif selector == 0:
         return visited[-1]
     else:
-        return _select_from_visited(visited, stochastic_round(selector))
+        return _select_from_visited(
+            visited, stochastic_round(selector, rng), rng
+            )
 
 
 def _neighbor_validator(maze: Maze, neighbors_index: int) -> MazeCell:
@@ -46,7 +50,8 @@ def _return_valid_dir_and_neighbor(
         current_cell: MazeCell,
         maze: Maze,
         maze_width: int,
-        maze_height: int
+        maze_height: int,
+        rng: random.Random
 ) -> tuple[Directions, MazeCell]:
     """
     Returns a valid cell's neighbor if any
@@ -57,7 +62,7 @@ def _return_valid_dir_and_neighbor(
     current_cell_index = current_cell.INDEX
 
     while len(directions):
-        dir = random.choice(directions)
+        dir = rng.choice(directions)
         try:
             neighbors_index = validate_direction(
                 current_cell_index, dir, maze_width, maze_height
@@ -103,7 +108,8 @@ def _connect_neighbor(
         maze: Maze,
         maze_width: int,
         maze_height: int,
-        visited_list: list[MazeCell]
+        visited_list: list[MazeCell],
+        rng: random.Random
 ) -> int:
     """
     Connects 'cell' with one of it's neighbors if possible
@@ -111,7 +117,7 @@ def _connect_neighbor(
 
     try:
         dir_and_neighbor = _return_valid_dir_and_neighbor(
-            current_cell, maze, maze_width, maze_height
+            current_cell, maze, maze_width, maze_height, rng
             )
     except NoValidNeighbors:
         return 0
@@ -129,7 +135,8 @@ def growing_tree(
         maze: Maze,
         maze_width: int,
         maze_height: int,
-        selector: float
+        selector: float,
+        rng: random.Random
 ) -> None:
     """
     Builds next path bewteen cells if possible
@@ -139,9 +146,9 @@ def growing_tree(
 
     try:
         while not could_connect:
-            current_cell = _select_from_visited(visited, selector)
+            current_cell = _select_from_visited(visited, selector, rng)
             could_connect = _connect_neighbor(
-                current_cell, maze, maze_width, maze_height, visited
+                current_cell, maze, maze_width, maze_height, visited, rng
             )
             if not could_connect:
                 visited.remove(current_cell)

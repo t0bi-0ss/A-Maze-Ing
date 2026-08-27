@@ -10,18 +10,18 @@ from collections.abc import Generator
 
 from .dead_end_deleter import dead_end_deleter
 
-import sys
+from .is_coliding import colition_checker
 
 
-def _starting_cell(maze: Maze) -> MazeCell:
+def _starting_cell(maze: Maze, rng: random.Random) -> MazeCell:
     """
     Selects a random cell from maze to use as a starting point
     """
 
-    cell = random.choice(maze)
+    cell = rng.choice(maze)
 
     if cell.static:
-        cell = _starting_cell(maze)
+        cell = _starting_cell(maze, rng)
     cell.is_now_visited()
     return cell
 
@@ -51,10 +51,12 @@ class MazeGenerator:
         self.PERFECT = perfect
         self.SELECTOR = selector
         self.SEED = seed
+        self.rng = random.Random(seed)
         self.PCENTERED = perfect_centered
         self.maze = [MazeCell(element_num) for element_num
                      in range(0, self.WIDTH * self.HEIGHT)]
-        pattern(self.maze, self.WIDTH, self.HEIGHT, self.PCENTERED)
+        pattern(self.maze, self.WIDTH, self.HEIGHT, self.PCENTERED, self.rng)
+        colition_checker(self.maze, self.ENTRY, self.EXIT, self.WIDTH)
         self.generator = self.gen_maze
 
     def gen_maze(self) -> Generator[Maze, None, None]:
@@ -62,7 +64,7 @@ class MazeGenerator:
         Returns a Maze generator
         """
 
-        visited_cells = [_starting_cell(self.maze)]
+        visited_cells = [_starting_cell(self.maze, self.rng)]
         while len(visited_cells):
             yield self.maze
             growing_tree(
@@ -70,56 +72,9 @@ class MazeGenerator:
                 self.maze,
                 self.WIDTH,
                 self.HEIGHT,
-                self.SELECTOR
+                self.SELECTOR,
+                self.rng
             )
         if not self.PERFECT:
-            dead_end_deleter(self.maze, self.WIDTH, self.HEIGHT)
+            dead_end_deleter(self.maze, self.WIDTH, self.HEIGHT, self.rng)
             yield self.maze
-
-    def transcript(self, output_file_name: str):
-        """
-        Transcripts all MazeCell's walls value in self.maze into a text file
-        while converting said values to hexadecimal
-        """
-
-        def to_hex(num):
-            match num:
-                case 10:
-                    return 'a'
-                case 11:
-                    return 'b'
-                case 12:
-                    return 'c'
-                case 13:
-                    return 'd'
-                case 14:
-                    return 'e'
-                case 15:
-                    return 'f'
-                case _:
-                    return str(num)
-
-        counter = 1
-        res = ""
-
-        for cell in self.maze:
-            res += to_hex(cell.walls)
-            if counter == self.WIDTH and cell != self.maze[-1]:
-                counter = 1
-                res += "\n"
-                continue
-            counter += 1
-
-        try:
-            with open(output_file_name, 'w') as f:
-                f.write(res)
-        except (
-                    UnicodeDecodeError,
-                    ValueError,
-                    OSError,
-                    PermissionError,
-                    IsADirectoryError,
-                    FileNotFoundError,
-        ) as msg:
-            print(msg)
-            sys.exit()

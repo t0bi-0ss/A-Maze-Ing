@@ -27,9 +27,10 @@ class MazeConfiguration(BaseModel):
         max_length=260,
         pattern=r"^[a-zA-Z0-9._-]+$"
     )
-    perfect: bool = False
+    perfect: bool
     seed: str | int | float | bytes | None = None
-    algorithm: Literal["prism", "backtracking", "hybrid"] = Field(default=None)
+    algorithm: Literal["prism", "backtracking", "gt"]
+    perfect_centered: bool
 
     @model_validator(mode="after")
     def validate_configuration(self) -> Self:
@@ -56,9 +57,10 @@ class MazeConfiguration(BaseModel):
                     " separated by a SINGLE comma"
                 )
 
+            # Check if either of it's elements are not an int or negative
             for item in pos_list:
                 try:
-                    assert int(item) > 0
+                    assert int(item) >= 0
                 except ValueError as msg:
                     raise ValueError(
                         f"ERROR in '{name}'\n" + str(msg)
@@ -67,6 +69,17 @@ class MazeConfiguration(BaseModel):
                     raise AssertionError(
                         f"ERROR in '{name}'\n"
                         f"Negative value found:{item}"
+                    )
+
+            # Check if either of it's elements exceeds maze boundaries
+            for item in pos_list:
+                try:
+                    assert self.height > int(item)
+                    assert self.width > int(item)
+                except AssertionError:
+                    raise AssertionError(
+                        f"ERROR in '{name}'\n"
+                        f"Value exceeds maze boundaries: {item}"
                     )
 
         validate_pos(self.exit, "EXIT")
@@ -117,7 +130,7 @@ def get_config(config_file: str) -> MazeConfiguration:
     config_vars = dict(parser['TOP'])
 
     if 'algorithm' not in config_vars:
-        config_vars['algorithm'] = 'hybrid'
+        config_vars['algorithm'] = 'gt'
 
     if 'seed' not in config_vars:
         config_vars['seed'] = None
@@ -129,6 +142,9 @@ def get_config(config_file: str) -> MazeConfiguration:
             print(f"ERROR in '{key}' parameter value:", msg)
             sys.exit()
 
+    if 'perfect_centered' not in config_vars:
+        config_vars['perfect_centered'] = True
+
     try:
         maze_config = MazeConfiguration(
             width=int(config_vars['width']),
@@ -138,7 +154,8 @@ def get_config(config_file: str) -> MazeConfiguration:
             output_file=config_vars['output_file'],
             perfect=parser.getboolean('TOP', 'perfect'),
             algorithm=config_vars['algorithm'],
-            seed=config_vars['seed']
+            seed=config_vars['seed'],
+            perfect_centered=parser.getboolean['TOP', 'perfect_centered']
         )
     except KeyError as msg:
         print(f"KeyError: key {msg} is missing from config file")
@@ -151,7 +168,7 @@ def get_config(config_file: str) -> MazeConfiguration:
         print(str(msg.errors()[0]['msg']))
         sys.exit()
     except ValueError as msg:
-        print("ERROR: 'PERFECT' parameter:", msg)
+        print("ERROR: 'PERFECT' or 'PERFECT_CENTERED' parameter:", msg)
         sys.exit()
 
     return maze_config

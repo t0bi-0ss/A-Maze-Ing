@@ -1,10 +1,11 @@
 from maze_generator import MazeGenerator
 from path_finder import path_finder
+from transcripter import transcripter
 
 if __name__ == "__main__":
 
     maze = MazeGenerator(
-        15, 15, (0, 0), (3, 3), 0.75, perfect=False, perfect_centered=True
+        15, 15, (0, 0), (3, 3), 0.75, perfect=True, perfect_centered=True
         )
 
     from collections import deque
@@ -21,6 +22,6 @@ if __name__ == "__main__":
     #     print()
     # Exhaust the generator instantly
     deque(maze.generator(), maxlen=0)
-    maze.transcript("maze.txt")
     path = path_finder(maze.maze, maze.ENTRY, maze.EXIT, maze.WIDTH)
+    transcripter(maze, "maze.txt", path)
     print(path)

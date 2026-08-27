@@ -5,7 +5,9 @@ from .mazecell import Maze
 from .directions import Directions, get_neighbors_index
 
 
-def _locate_center(maze_width: int, maze_height: int) -> int:
+def _locate_center(
+        maze_width: int, maze_height: int, rng: random.Random
+) -> int:
     """
     Locates maze's most approximate center
     """
@@ -20,7 +22,7 @@ def _locate_center(maze_width: int, maze_height: int) -> int:
             maze_width + (maze_width // 2)
         possible_indexes.append(left_center_index)
         possible_indexes.append(right_center_index)
-        return random.choice(possible_indexes)
+        return rng.choice(possible_indexes)
     if maze_width % 2 != 0 and maze_height % 2 == 0:
         top_center_index = ((maze_height // 2) - 1) \
             * maze_width + (maze_width // 2)
@@ -28,11 +30,11 @@ def _locate_center(maze_width: int, maze_height: int) -> int:
             * maze_width + (maze_width // 2)
         possible_indexes.append(top_center_index)
         possible_indexes.append(bottom_center_index)
-        return random.choice(possible_indexes)
+        return rng.choice(possible_indexes)
     if maze_width % 2 == 0 and maze_height % 2 == 0:
         rows = [maze_height // 2 - 1, maze_height // 2]
         cols = [maze_width // 2 - 1, maze_width // 2]
-        return random.choice(rows) * maze_width + random.choice(cols)
+        return rng.choice(rows) * maze_width + rng.choice(cols)
 
 
 def _set_static_sequence(
@@ -102,7 +104,11 @@ def _set_two_pattern(maze: Maze, maze_width: int, starting_index: int) -> None:
 
 
 def pattern(
-        maze: Maze, maze_width: int, maze_height: int, perfect_centered: bool
+        maze: Maze,
+        maze_width: int,
+        maze_height: int,
+        perfect_centered: bool,
+        rng: random.Random
         ) -> None:
     """Sets '42' pattern in the maze if possible"""
 
@@ -115,7 +121,7 @@ def pattern(
             " perfectly centered"
         )
         return
-    maze_center_index = _locate_center(maze_width, maze_height)
+    maze_center_index = _locate_center(maze_width, maze_height, rng)
     two_starting_index = maze_center_index - maze_width * 2 + 1
     four_starting_index = maze_center_index - maze_width * 2 - 3
     _set_two_pattern(maze, maze_width, two_starting_index)

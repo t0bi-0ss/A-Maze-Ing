@@ -41,7 +41,7 @@ def path_finder(
         except UnreachableCellsError:
             break
         else:
-            set_neighbors_distance(maze, unvisited, maze_width, current_cell)
+            set_neighbors_distance(maze, maze_width, current_cell)
             unvisited.remove(current_cell)
 
     path = path_to_entrance(maze, exit_cell, maze_width)

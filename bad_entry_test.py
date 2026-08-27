@@ -1,4 +1,5 @@
 from maze_generator import MazeGenerator
+from transcripter import transcripter
 
 if __name__ == "__main__":
 
@@ -20,4 +21,4 @@ if __name__ == "__main__":
     #     print()
     # Exhaust the generator instantly
     deque(maze.generator(), maxlen=0)
-    maze.transcript("maze.txt")
+    transcripter(maze, "maze.txt")

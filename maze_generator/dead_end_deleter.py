@@ -80,7 +80,7 @@ def _is_a_corner(maze: Maze, cell: MazeCell, width: int, height: int) -> int:
 
 
 def _delete_walls(
-        maze: Maze, cell: MazeCell, width: int, height: int
+        maze: Maze, cell: MazeCell, width: int, height: int, rng: random.Random
 ) -> None:
     """
     Deletes a 'dead end'
@@ -89,7 +89,7 @@ def _delete_walls(
     directions = [direction for direction in Directions]
 
     while len(directions):
-        dir = random.choice(directions)
+        dir = rng.choice(directions)
         try:
             neighbors_index = validate_direction(
                 cell.INDEX, dir, width, height
@@ -106,7 +106,9 @@ def _delete_walls(
                 directions.remove(dir)
 
 
-def dead_end_deleter(maze: Maze, width: int, height: int) -> None:
+def dead_end_deleter(
+        maze: Maze, width: int, height: int, rng: random.Random
+) -> None:
     """
     Searches maze for 'dead ends' and deletes them all
     """
@@ -117,4 +119,4 @@ def dead_end_deleter(maze: Maze, width: int, height: int) -> None:
         else:
             walls = _count_walls(cell)
             if walls == 3:
-                _delete_walls(maze, cell, width, height)
+                _delete_walls(maze, cell, width, height, rng)

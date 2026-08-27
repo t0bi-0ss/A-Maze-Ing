@@ -27,7 +27,7 @@ def colition_checker(
     if entry in pattern_cells or exit in pattern_cells:
         print(
             "ERROR: unsolvable maze. Either entry or exit coordinates"
-            " coincide with one of the '42' pattern cells."
+            " coincide with one of the '42' pattern cells"
             "\nPattern cells coordinates =",
             pattern_cells,
             "\nEntry coordinates =", entry,
