@@ -1,5 +1,4 @@
-from maze_generator import MazeGenerator
-
+from maze_generator import Maze
 from .helper_f import select_from_unvisited, set_neighbors_distance, \
     path_to_entrance
 
@@ -7,7 +6,7 @@ from .exceptions import UnreachableCellsError
 
 
 def path_finder(
-        maze: MazeGenerator,
+        maze: Maze,
         entrance: tuple[str, str],
         exit: tuple[str, str],
         maze_width: int

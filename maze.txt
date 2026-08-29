@@ -1,14 +1,14 @@
-93d517d553
-ac796d1152
-8514556e92
-afabbfffaa
-afc6857fae
-afffafffc3
-c3bfafd516
-942fafffc3
-ed6d03d13a
-d5556c56c6
+bd155397d3
+8503944552
+afaeefff96
+afc5157f83
+afffafffaa
+c57fafd56a
+957fafffd2
+ad512bd152
+c512e83a96
+d56c56eec7
 
 1,2		# entry	(x,y)
 2,3		# exit	(x,y)
-WNWSSEEE
+ES

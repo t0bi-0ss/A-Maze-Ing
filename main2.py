@@ -1,11 +1,13 @@
 import sys
 import itertools
+import parser_output
 from maze_generator import MazeGenerator
 from parser import get_config, MazeConfiguration
 from path_finder import path_finder
 from transcripter import transcripter
 from time import sleep
 import os
+import random
 
 # Bitmask
 WALL_NORTH = 1 << 0  # 0001
@@ -289,9 +291,6 @@ class MazeVisualizer:
         end: tuple[int, int],
         seed: float
     ) -> None:
-        from time import sleep
-        import os
-        import parser_output
 
         generator = MazeGenerator(
                 width=configuration.width,
@@ -312,6 +311,13 @@ class MazeVisualizer:
                 )
             visualizer.render_ascii()
             # sleep(.1)
+        solution = path_finder(
+            generator.maze,
+            generator.ENTRY,
+            generator.EXIT,
+            generator.WIDTH
+        )
+        transcripter(generator, "maze.txt", solution)
 
     @staticmethod
     def interactive_menu(
@@ -325,12 +331,13 @@ class MazeVisualizer:
         while True:
             print("\n=== A-Maze-ing Interactive Menu ===")
             print("1. Re-generate maze")
-            print("2. Show / Hide the solution path")
-            print("3. Next Color Combination")
-            print("4. Exit")
+            print("2. Generate new maze")
+            print("3. Show / Hide the solution path")
+            print("4. Next Color Combination")
+            print("5. Exit")
 
             try:
-                choice = input("Select an option (1-3): ").strip()
+                choice = input("Select an option (1-5): ").strip()
                 print()
             except (EOFError, KeyboardInterrupt):
                 sys.exit()
@@ -345,14 +352,23 @@ class MazeVisualizer:
                         seed
                     )
                 case "2":
+                    MazeVisualizer.generate_maze(
+                        configuration,
+                        visualizer,
+                        route_coordinates,
+                        start,
+                        end,
+                        seed=random.random()
+                    )
+                case "3":
                     os.system('cls' if os.name == 'nt' else 'clear')
                     visualizer.show_path = not visualizer.show_path
                     visualizer.render_ascii()
-                case "3":
+                case "4":
                     os.system('cls' if os.name == 'nt' else 'clear')
                     visualizer.change_color_palette()
                     visualizer.render_ascii()
-                case "4":
+                case "5":
                     print("Exiting program.")
                     break
                 case _:
