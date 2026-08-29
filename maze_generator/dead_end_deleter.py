@@ -107,16 +107,19 @@ def _delete_walls(
 
 
 def dead_end_deleter(
-        maze: Maze, width: int, height: int, rng: random.Random
+        maze: Maze,
+        cell: MazeCell,
+        width: int,
+        height: int,
+        rng: random.Random
 ) -> None:
     """
     Searches maze for 'dead ends' and deletes them all
     """
 
-    for cell in maze:
-        if _is_a_corner(maze, cell, width, height) or cell.static:
-            continue
-        else:
-            walls = _count_walls(cell)
-            if walls == 3:
-                _delete_walls(maze, cell, width, height, rng)
+    if _is_a_corner(maze, cell, width, height) or cell.static:
+        return
+    else:
+        walls = _count_walls(cell)
+        if walls == 3:
+            _delete_walls(maze, cell, width, height, rng)

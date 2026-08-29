@@ -6,6 +6,8 @@ from typing_extensions import Self
 
 from typing import Literal
 
+import random
+
 """
 Pending DocString
 """
@@ -140,8 +142,8 @@ def get_config(config_file: str) -> MazeConfiguration:
             exit=config_vars['exit'].split(','),
             output_file=config_vars['output_file'],
             perfect=config_vars.get('perfect', True),
-            algorithm=config_vars.get('algorithm'),
-            seed=config_vars.get('seed'),
+            algorithm=config_vars.get('algorithm', 'gt'),
+            seed=config_vars.get('seed', random.random()),
             perfect_centered=config_vars.get('perfect_centered', True)
         )
     except KeyError as msg:
