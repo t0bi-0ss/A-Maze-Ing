@@ -1,6 +1,4 @@
-from configparser import ConfigParser, ParsingError
-
-import sys
+from configparser import ConfigParser, ParsingError, InterpolationSyntaxError
 
 from pydantic import ValidationError, BaseModel, Field, model_validator
 
@@ -11,6 +9,12 @@ from typing import Literal
 """
 Pending DocString
 """
+
+
+class InvalidTerminalNodesError(Exception):
+    """
+    Exception raised when either of the terminal nodes is invalid
+    """
 
 
 class MazeConfiguration(BaseModel):
@@ -29,8 +33,41 @@ class MazeConfiguration(BaseModel):
     )
     perfect: bool
     seed: str | int | float | bytes | None = None
-    algorithm: Literal["prism", "backtracking", "gt"]
+    algorithm: Literal["prism", "backtracking", "gt"] = Field(default="gt")
     perfect_centered: bool
+
+    @staticmethod
+    def validate_pos(
+        maze_width: int,
+        maze_height: int,
+        pos: tuple[str, str],
+        name: str
+    ) -> None:
+        """
+        Validates position ('pos') values also considering max_value
+        """
+
+        # Check if either of it's elements are not an int or negative
+        try:
+            x = int(pos[0])
+            y = int(pos[1])
+        except ValueError as msg:
+            raise ValueError(
+                f"'{name}'\n" + str(msg)
+            )
+
+        # Check if either of it's elements exceeds maze boundaries
+        if x >= maze_height or x < 0:
+            raise ValueError(
+                f"{name} = {pos} x value is out of"
+                " bounds"
+            )
+
+        if y >= maze_width or y < 0:
+            raise ValueError(
+                f"{name} = {pos} y value is out of"
+                " bounds"
+            )
 
     @model_validator(mode="after")
     def validate_configuration(self) -> Self:
@@ -38,46 +75,15 @@ class MazeConfiguration(BaseModel):
         Validates 'entry' and 'exit' before instatiation
         """
 
+        entry_copy = [coord.replace(" ", "") for coord in self.entry]
+        exit_copy = [coord.replace(" ", "") for coord in self.exit]
+        if entry_copy == exit_copy:
+            raise ValueError("Entry and exit coordinates must differ")
         try:
-            assert self.exit != self.entry
-        except AssertionError:
-            raise AssertionError(
-                "ERROR: 'ENTRY' and 'EXIT' coordinates must be different"
-            )
-
-        def validate_pos(pos: tuple[str, str], name: str) -> None:
-            """
-            validates both 'entry' and 'exit' formats
-            """
-
-            # Check if either of it's elements are not an int or negative
-            for item in pos:
-                try:
-                    assert int(item) >= 0
-                except ValueError as msg:
-                    raise ValueError(
-                        f"ERROR in '{name}'\n" + str(msg)
-                    )
-                except AssertionError:
-                    raise AssertionError(
-                        f"ERROR in '{name}'\n"
-                        f"Negative value found:{item}"
-                    )
-
-            # Check if either of it's elements exceeds maze boundaries
-            for item in pos:
-                try:
-                    assert self.height > int(item)
-                    assert self.width > int(item)
-                except AssertionError:
-                    raise AssertionError(
-                        f"ERROR in '{name}'\n"
-                        f"Value exceeds maze boundaries: {item}"
-                    )
-
-        validate_pos(self.exit, "EXIT")
-        validate_pos(self.entry, "ENTRY")
-
+            self.validate_pos(self.width, self.height, self.exit, "EXIT")
+            self.validate_pos(self.width, self.height, self.entry, "ENTRY")
+        except ValueError as msg:
+            raise ValueError(msg)
         return self
 
     def __str__(self) -> str:
@@ -115,50 +121,43 @@ def get_config(config_file: str) -> MazeConfiguration:
             FileNotFoundError,
     ) as msg:
         print(msg)
-        sys.exit()
+        raise SystemExit
     except ParsingError as msg:
         print("ERROR: invalid syntax for 'config' file")
         print(msg)
-        sys.exit()
+        raise SystemExit
+    except InterpolationSyntaxError as msg:
+        raise SystemExit(msg)
 
+    # Get dict of configparser options
     config_vars = dict(parser['TOP'])
-
-    if 'algorithm' not in config_vars:
-        config_vars['algorithm'] = 'gt'
-
-    if 'seed' not in config_vars:
-        config_vars['seed'] = None
-
-    for key in ['width', 'height']:
-        try:
-            int(config_vars[key])
-        except ValueError as msg:
-            print(f"ERROR in '{key}' parameter value:", msg)
-            sys.exit()
-
-    if 'perfect_centered' not in config_vars:
-        parser['TOP']['perfect_centered'] = 'True'
 
     try:
         maze_config = MazeConfiguration(
-            width=int(config_vars['width']),
-            height=int(config_vars['height']),
+            width=config_vars['width'],
+            height=config_vars['height'],
             entry=config_vars['entry'].split(','),
             exit=config_vars['exit'].split(','),
             output_file=config_vars['output_file'],
-            perfect=parser.getboolean('TOP', 'perfect'),
-            algorithm=config_vars['algorithm'],
-            seed=config_vars['seed'],
-            perfect_centered=parser.getboolean('TOP', 'perfect_centered')
+            perfect=config_vars.get('perfect', True),
+            algorithm=config_vars.get('algorithm'),
+            seed=config_vars.get('seed'),
+            perfect_centered=config_vars.get('perfect_centered', True)
         )
     except KeyError as msg:
-        print(f"KeyError: key {msg} is missing from config file")
-        sys.exit()
+        raise SystemExit(
+            f"KeyError: key {str(msg).upper()} is missing from config file"
+        )
     except ValidationError as msg:
-        print(msg.errors()[0]['msg'])
-        sys.exit()
-    except ValueError as msg:
-        print("ERROR: 'PERFECT' or 'PERFECT_CENTERED' parameter:", msg)
-        sys.exit()
+        msg_d = msg.errors()[0]
+        loc = msg_d.get('loc')
+        input = msg_d['input']
+        if loc:
+            message = f"{loc[0].upper()} = {input}: {msg_d['msg']}"
+        else:
+            message = f"{msg_d['msg'].removeprefix("Value error, ")}"
+        raise SystemExit(
+            "ERROR: invalid option " + message
+        )
 
     return maze_config
