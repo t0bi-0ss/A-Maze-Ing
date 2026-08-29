@@ -33,4 +33,4 @@ def colition_checker(
             "\nEntry coordinates =", entry,
             "\nExit coordinates =", exit
         )
-        sys.exit
+        sys.exit()
