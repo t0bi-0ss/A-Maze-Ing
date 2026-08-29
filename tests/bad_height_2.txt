@@ -1,0 +1,11 @@
+# Required keys: width, height, entry exit output_file perfect
+# optional keys: seed, algorithm, display mode, algorithm, perfect_centered
+
+WIDTH = 20
+height = 43
+entry = 1, 2
+EXIT = 2,3
+output_file = 15555
+perfect = 1
+# seed = 2
+algorithm = gt
