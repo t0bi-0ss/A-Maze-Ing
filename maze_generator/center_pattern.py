@@ -4,6 +4,8 @@ from .mazecell import Maze
 
 from .directions import Directions, get_neighbors_index
 
+from time import sleep
+
 
 def _locate_center(
         maze_width: int, maze_height: int, rng: random.Random
@@ -114,12 +116,14 @@ def pattern(
 
     if maze_width < 9 or maze_height < 8:
         print("ERROR: maze is not big enough to hold the '42' pattern")
+        sleep(1)
         return
     if (maze_width % 2 == 0 or maze_height % 2 == 0) and perfect_centered:
         print(
             "ERROR: either width or center is not odd so '42' could not be"
             " perfectly centered"
         )
+        sleep(1)
         return
     maze_center_index = _locate_center(maze_width, maze_height, rng)
     two_starting_index = maze_center_index - maze_width * 2 + 1
