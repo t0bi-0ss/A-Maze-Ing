@@ -1,13 +1,4 @@
-import sys
 import itertools
-import parser_output
-from maze_generator import MazeGenerator
-from parser import get_config, MazeConfiguration
-from path_finder import path_finder
-from transcripter import transcripter
-from time import sleep
-import os
-import random
 
 # Bitmask
 WALL_NORTH = 1 << 0  # 0001
@@ -25,45 +16,11 @@ COLOR_PALETTES: tuple[tuple[str, str, str], ...] = (
 )
 
 
-def plot_route(start: tuple[int, int], steps: str) -> list[tuple[int, int]]:
-    """Take the start and go for the end with the route"""
-    route_coordinates = [start]
-    f, c = start
-
-    movements = {
-        'E': (0, 1),
-        'W': (0, -1),
-        'S': (1, 0),
-        'N': (-1, 0)
-    }
-
-    for step in steps.upper():
-        if step in movements:
-            df, dc = movements[step]
-            f += df
-            c += dc
-            route_coordinates.append((f, c))
-
-    return route_coordinates
-
-
 class MazeVisualizer:
     """Class responsible for visual representation and interactivity"""
 
-    def __init__(self, matrix: list[list[int]], route: list[tuple[int, int]],
+    def __init__(self, route: list[tuple[int, int]],
                  start: tuple[int, int], end: tuple[int, int]) -> None:
-        valid_rows = []
-        for row in matrix:
-            if (isinstance(row, list) and len(row) > 0 and
-                    all(isinstance(x, int) for x in row)):
-                valid_rows.append(row)
-
-        if valid_rows:
-            common_width = len(valid_rows[0])
-            self.matrix = [f for f in valid_rows if len(f) == common_width]
-        else:
-            self.matrix = []
-
         self.full_route = route
         self.start = start
         self.end = end
@@ -73,14 +30,26 @@ class MazeVisualizer:
         (self.current_wall, self.current_42,
          self.current_route) = next(self._palette_iterator)
 
-    def render_ascii(self) -> None:
+    def render_ascii(self, matrix: list[list[int]]) -> None:
         """Generate a visual representation of the maze"""
-        rows = len(self.matrix)
-        if rows == 0:
-            print("Error: The maze matrix is empty or invalid.")
+
+        if not matrix:
+            print("ERROR: The maze matrix is empty")
+            return
+        valid_rows = []
+        common_width = len(matrix[0])
+        for row in matrix:
+            if (isinstance(row, list) and len(row) > 0 and
+                    (all(isinstance(x, int) for x in row)) and
+                    (len(row) == common_width)):
+                valid_rows.append(row)
+        if not valid_rows or len(valid_rows) != len(matrix):
+            print(f"len valid rows: {len(valid_rows)}")
+            print(f"len matrix: {len(matrix)}")
+            print("Error: The maze matrix is invalid.")
             return
 
-        columns = len(self.matrix[0])
+        columns = len(matrix[0])
         RESET_COLOR = "\033[0m"
 
         # Start and end blocks
@@ -101,12 +70,12 @@ class MazeVisualizer:
                   RESET_COLOR)
 
         # Body path
-        for f in range(rows):
+        for f in range(len(matrix)):
             body_line_top = self.current_wall + BLOCK + RESET_COLOR
             body_line_bottom = self.current_wall + BLOCK + RESET_COLOR
 
             for c in range(columns):
-                v = self.matrix[f][c]
+                v = matrix[f][c]
                 c1_42 = (v & LOCKED_CELL) == LOCKED_CELL
 
                 if (f, c) == self.start:
@@ -180,7 +149,7 @@ class MazeVisualizer:
 
                 # East Wall (Intermediate side walls)
                 if c < columns - 1:
-                    v_next = self.matrix[f][c + 1]
+                    v_next = matrix[f][c + 1]
                     c2_42 = (v_next & LOCKED_CELL) == LOCKED_CELL
 
                     next_horizontal = False
@@ -220,12 +189,12 @@ class MazeVisualizer:
             print(body_line_bottom)
 
             # --- Vertical Connections and Intersections ---
-            if f < rows - 1:
+            if f < len(matrix) - 1:
                 connector_line = self.current_wall + BLOCK + RESET_COLOR
 
                 for c in range(columns):
-                    v = self.matrix[f][c]
-                    v_bottom = self.matrix[f + 1][c]
+                    v = matrix[f][c]
+                    v_bottom = matrix[f + 1][c]
 
                     c1_42 = (v & LOCKED_CELL) == LOCKED_CELL
                     c3_42 = (v_bottom & LOCKED_CELL) == LOCKED_CELL
@@ -255,8 +224,8 @@ class MazeVisualizer:
 
                     # Diagonal intersection
                     if c < columns - 1:
-                        v_right = self.matrix[f][c + 1]
-                        v_bot_right = self.matrix[f + 1][c + 1]
+                        v_right = matrix[f][c + 1]
+                        v_bot_right = matrix[f + 1][c + 1]
 
                         c2_42 = (v_right & LOCKED_CELL) == LOCKED_CELL
                         c4_42 = (v_bot_right & LOCKED_CELL) == LOCKED_CELL
@@ -281,154 +250,3 @@ class MazeVisualizer:
     def change_color_palette(self) -> None:
         (self.current_wall, self.current_42,
          self.current_route) = next(self._palette_iterator)
-
-    @staticmethod
-    def generate_maze(
-        configuration: MazeConfiguration,
-        visualizer: MazeVisualizer,
-        route_coordinates: list[tuple[int, int]],
-        start: tuple[int, int],
-        end: tuple[int, int],
-        seed: float
-    ) -> None:
-
-        generator = MazeGenerator(
-                width=configuration.width,
-                height=configuration.height,
-                entry=configuration.entry,
-                exit=configuration.exit,
-                perfect=configuration.perfect,
-                seed=seed,
-                perfect_centered=configuration.perfect_centered
-            )
-
-        for _ in generator.generator():
-            os.system('cls' if os.name == 'nt' else 'clear')
-            transcripter(generator, "maze.txt")
-            matrix = parser_output.load_configuration("maze.txt")[0]
-            visualizer = MazeVisualizer(
-                matrix, route_coordinates, start, end
-                )
-            visualizer.render_ascii()
-            # sleep(.1)
-        solution = path_finder(
-            generator.maze,
-            generator.ENTRY,
-            generator.EXIT,
-            generator.WIDTH
-        )
-        transcripter(generator, "maze.txt", solution)
-
-    @staticmethod
-    def interactive_menu(
-        configuration: MazeConfiguration,
-        visualizer: MazeVisualizer,
-        route_coordinates: list[tuple[int, int]],
-        start: tuple[int, int],
-        end: tuple[int, int],
-        seed: float
-    ) -> None:
-        while True:
-            print("\n=== A-Maze-ing Interactive Menu ===")
-            print("1. Re-generate maze")
-            print("2. Generate new maze")
-            print("3. Show / Hide the solution path")
-            print("4. Next Color Combination")
-            print("5. Exit")
-
-            try:
-                choice = input("Select an option (1-5): ").strip()
-                print()
-            except (EOFError, KeyboardInterrupt):
-                sys.exit()
-            match choice:
-                case "1":
-                    MazeVisualizer.generate_maze(
-                        configuration,
-                        visualizer,
-                        route_coordinates,
-                        start,
-                        end,
-                        seed
-                    )
-                case "2":
-                    MazeVisualizer.generate_maze(
-                        configuration,
-                        visualizer,
-                        route_coordinates,
-                        start,
-                        end,
-                        seed=random.random()
-                    )
-                case "3":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    visualizer.show_path = not visualizer.show_path
-                    visualizer.render_ascii()
-                case "4":
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    visualizer.change_color_palette()
-                    visualizer.render_ascii()
-                case "5":
-                    print("Exiting program.")
-                    break
-                case _:
-                    print("Invalid option. Please try again.")
-
-
-def main() -> None:
-    if len(sys.argv) != 2:
-        print("Usage: python3 main.py <config_file>")
-        sys.exit(1)
-
-    config_filename = sys.argv[1]
-
-    try:
-        import parser_output
-        matrix, start, end, ruta_str = (parser_output.
-                                        load_configuration(config_filename))
-        route_coordinates = plot_route(start, ruta_str)
-
-    except ImportError:
-        print("Error: Could not import module 'parser'."
-              " Ensure parser.py is in the same directory.")
-        sys.exit(1)
-    except FileNotFoundError:
-        print(f"Error: File '{config_filename}' not found.")
-        sys.exit(1)
-    except Exception as e:
-        print(f"Error loading or parsing configuration: {e}")
-        sys.exit(1)
-
-    print("\n=== Maze ===")
-    configuration = get_config("config.txt")
-    maze = MazeGenerator(
-            width=configuration.width,
-            height=configuration.height,
-            entry=configuration.entry,
-            exit=configuration.exit,
-            perfect=configuration.perfect,
-            seed=configuration.seed,
-            perfect_centered=configuration.perfect_centered
-        )
-
-    for _ in maze.generator():
-        os.system('cls' if os.name == 'nt' else 'clear')
-        transcripter(maze, "maze.txt")
-        matrix = parser_output.load_configuration("maze.txt")[0]
-        visualizer = MazeVisualizer(matrix, route_coordinates, start, end)
-        visualizer.render_ascii()
-        # sleep(.1)
-    solution = path_finder(maze.maze, maze.ENTRY, maze.EXIT, maze.WIDTH)
-    transcripter(maze, "maze.txt", solution)
-    visualizer.interactive_menu(
-        configuration,
-        visualizer,
-        route_coordinates,
-        start,
-        end,
-        maze.SEED
-    )
-
-
-if __name__ == "__main__":
-    main()
