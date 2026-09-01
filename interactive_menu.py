@@ -15,23 +15,33 @@ import transcripter
 from time import sleep
 
 
+def _visualizer_route_update(
+        maze_generator: maze_generator.MazeGenerator,
+        visualizer: maze_visualizer.MazeVisualizer
+) -> None:
+
+    solution = path_finder.path_finder(
+        maze_generator.maze,
+        maze_generator.ENTRY,
+        maze_generator.EXIT,
+        maze_generator.WIDTH
+    )
+    route = helper_f.plot_route(visualizer.start, solution)
+    visualizer.full_route = route
+
+
 def interactive_menu(
         maze_generator: maze_generator.MazeGenerator,
         visualizer: maze_visualizer.MazeVisualizer,
 ) -> None:
 
-    animation_toggle = 1
+    animation_toggle = 0
     original = 1
     original_seed = maze_generator.SEED
 
-    # converted_matrix = helper_f.matrix_converter(
-    #                     maze_generator.maze,
-    #                     maze_generator.WIDTH
-    #                     )
-
     while True:
         options = [
-            f"Toggle Animation. {'OFF' if animation_toggle else 'ON'}",
+            f"Toggle Animation. {'ON' if animation_toggle else 'OFF'}",
             "Re-generate maze",
             "Generate new maze",
             "Show/Hide solution path",
@@ -51,13 +61,19 @@ def interactive_menu(
                 ).strip()
             print()
         except (EOFError, KeyboardInterrupt):
+            print()
+            transcripter.transcripter(maze_generator)
             sys.exit()
         match choice:
             case "1":  # Toggle animation
-                animation_toggle = 0 if animation_toggle else 1
+                animation_toggle = not animation_toggle
                 helper_f.clear()
-                helper_f.visualize_generation(
-                    animation_toggle, maze_generator, visualizer
+                visualizer.show_path = False
+                visualizer.render_ascii(
+                    matrix=helper_f.matrix_converter(
+                        maze_generator.maze,
+                        maze_generator.WIDTH
+                        )
                 )
             case "2":  # Re-generate
                 helper_f.visualize_generation(
@@ -70,14 +86,7 @@ def interactive_menu(
                 helper_f.visualize_generation(
                     animation_toggle, maze_generator, visualizer
                 )
-                solution = path_finder.path_finder(
-                    maze_generator.maze,
-                    maze_generator.ENTRY,
-                    maze_generator.EXIT,
-                    maze_generator.WIDTH
-                )
-                route = helper_f.plot_route(visualizer.start, solution)
-                visualizer.full_route = route
+                _visualizer_route_update(maze_generator, visualizer)
             case "4":  # Solution path
                 helper_f.clear()
                 visualizer.show_path = not visualizer.show_path
@@ -109,29 +118,14 @@ def interactive_menu(
                     helper_f.visualize_generation(
                         animation_toggle, maze_generator, visualizer
                     )
-                    solution = path_finder.path_finder(
-                        maze_generator.maze,
-                        maze_generator.ENTRY,
-                        maze_generator.EXIT,
-                        maze_generator.WIDTH
-                    )
-                    route = helper_f.plot_route(visualizer.start, solution)
-                    visualizer.full_route = route
+                    _visualizer_route_update(maze_generator, visualizer)
             case "7":  # Output file
-                solution = path_finder.path_finder(
-                    maze_generator.maze,
-                    maze_generator.ENTRY,
-                    maze_generator.EXIT,
-                    maze_generator.WIDTH
-                )
-                transcripter.transcripter(maze_generator, solution)
+                transcripter.transcripter(maze_generator)
                 maze_generator.rng = random.Random(maze_generator.SEED)
-                print(f'Content saved to "{maze_generator.OUTPUT_FILE}"')
-                sleep(2)
                 helper_f.visualize_generation(
                     0, maze_generator, visualizer
                 )
-            case "8":
+            case "8":  # Re-load config
                 maze_generator = helper_f.load_config(sys.argv[1])
                 helper_f.clear()
                 visualizer.start = helper_f.convert_pos(maze_generator.ENTRY)
@@ -140,6 +134,7 @@ def interactive_menu(
                                         0, maze_generator, visualizer
                                     )
             case "9":  # Exit
+                transcripter.transcripter(maze_generator)
                 print("Exiting program.")
                 break
             case _:

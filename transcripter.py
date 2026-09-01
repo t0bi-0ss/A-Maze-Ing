@@ -4,8 +4,12 @@ from maze_generator import MazeGenerator
 
 from helper_f import get_pos, to_hex
 
+from time import sleep
 
-def transcripter(maze: MazeGenerator, solution: str = None):
+import path_finder
+
+
+def transcripter(maze_generator: MazeGenerator):
     """
     Transcripts all MazeCell's walls value in maze into a text file
     while converting said values to hexadecimal
@@ -15,9 +19,9 @@ def transcripter(maze: MazeGenerator, solution: str = None):
     counter = 1
     res = ""
 
-    for cell in maze.maze:
+    for cell in maze_generator.maze:
         res += to_hex(cell.walls)
-        if counter == maze.WIDTH and cell != maze.maze[-1]:
+        if counter == maze_generator.WIDTH and cell != maze_generator.maze[-1]:
             counter = 1
             res += "\n"
             continue
@@ -25,17 +29,22 @@ def transcripter(maze: MazeGenerator, solution: str = None):
 
     # Pass entry and exit
     res += "\n\n"
-    entry = get_pos(maze.ENTRY)
-    exit = get_pos(maze.EXIT)
-    res += f"{entry}\t\t# entry\t(x,y)\n"
-    res += f"{exit}\t\t# exit\t(x,y)\n"
+    entry = get_pos(maze_generator.ENTRY)
+    exit = get_pos(maze_generator.EXIT)
+    res += f"{entry}\n"
+    res += f"{exit}\n"
 
     # Pass solution
-    if solution:
-        res += solution
+    solution = path_finder.path_finder(
+                                    maze_generator.maze,
+                                    maze_generator.ENTRY,
+                                    maze_generator.EXIT,
+                                    maze_generator.WIDTH
+                                )
+    res += solution
 
     try:
-        with open(maze.OUTPUT_FILE, 'w') as f:
+        with open(maze_generator.OUTPUT_FILE, 'w') as f:
             f.write(res)
     except (
                 UnicodeDecodeError,
@@ -47,3 +56,6 @@ def transcripter(maze: MazeGenerator, solution: str = None):
     ) as msg:
         print(msg)
         sys.exit()
+    else:
+        print(f'Content saved to "{maze_generator.OUTPUT_FILE}"')
+        sleep(2)

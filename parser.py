@@ -31,7 +31,7 @@ class MazeConfiguration(BaseModel):
     output_file: str = Field(
         min_length=5,
         max_length=260,
-        pattern=r"^[a-zA-Z0-9._-]+$"
+        pattern=r"^[a-zA-Z0-9._-ñ]+$"
     )
     perfect: bool
     seed: str | int | float | bytes | None = None
@@ -141,7 +141,7 @@ def get_config(config_file: str) -> MazeConfiguration:
             entry=config_vars['entry'].split(','),
             exit=config_vars['exit'].split(','),
             output_file=config_vars['output_file'],
-            perfect=config_vars.get('perfect', True),
+            perfect=config_vars.get('perfect', False),
             algorithm=config_vars.get('algorithm', 'gt'),
             seed=config_vars.get('seed', random.random()),
             perfect_centered=config_vars.get('perfect_centered', True)

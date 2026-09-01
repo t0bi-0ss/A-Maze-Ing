@@ -1,9 +1,9 @@
-WIDTH = 12
-height = 12
+WIDTH = 20
+height = 20
 entry = 1,1
-EXIT = 2,1
-output_file = 15555
-perfect = TRUE
+EXIT = 18,    15
+output_file = sdfásdf
+perfect = 0
 seed = 2
 algorithm = prism
 perfect_centered = 0

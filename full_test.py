@@ -42,9 +42,9 @@ if __name__ == "__main__":
     # Initiate visualizer
     visualizer = maze_visualizer.MazeVisualizer(route, start, end)
     visualizer.render_ascii(helper_f.matrix_converter(maze.maze, maze.WIDTH))
+
     # Restart rng
     maze.rng = random.Random(maze.SEED)
 
-    # helper_f.visualize_generation(1, maze, visualizer)
     # Menu
     interactive_menu.interactive_menu(maze, visualizer)
