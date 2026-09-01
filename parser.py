@@ -1,3 +1,5 @@
+"""Configuration parsing and validation utilities for the maze project."""
+
 from configparser import ConfigParser, ParsingError, InterpolationSyntaxError
 
 from pydantic import ValidationError, BaseModel, Field, model_validator
@@ -8,21 +10,13 @@ from typing import Literal
 
 import random
 
-"""
-Pending DocString
-"""
-
 
 class InvalidTerminalNodesError(Exception):
-    """
-    Exception raised when either of the terminal nodes is invalid
-    """
+    """Raised when a maze terminal node is invalid."""
 
 
 class MazeConfiguration(BaseModel):
-    """
-    BaseModel for maze configuration
-    """
+    """Validated configuration data for generating a maze."""
 
     width: int = Field(gt=2, le=25)
     height: int = Field(gt=2, le=25)
@@ -45,8 +39,17 @@ class MazeConfiguration(BaseModel):
         pos: tuple[str, str],
         name: str
     ) -> None:
-        """
-        Validates position ('pos') values also considering max_value
+        """Validate a coordinate pair against maze boundaries.
+
+        Args:
+            maze_width: Width of the maze in cells.
+            maze_height: Height of the maze in cells.
+            pos: Position tuple to validate.
+            name: Field name used in error messages.
+
+        Raises:
+            ValueError: If the coordinate is not an integer or lies outside the
+                maze bounds.
         """
 
         # Check if either of it's elements are not an int or negative
@@ -73,8 +76,13 @@ class MazeConfiguration(BaseModel):
 
     @model_validator(mode="after")
     def validate_configuration(self) -> Self:
-        """
-        Validates 'entry' and 'exit' before instatiation
+        """Validate entry and exit coordinates before model creation.
+
+        Returns:
+            The validated configuration instance.
+
+        Raises:
+            ValueError: If the entry or exit cells are invalid or identical.
         """
 
         entry_copy = [coord.replace(" ", "") for coord in self.entry]
@@ -89,9 +97,7 @@ class MazeConfiguration(BaseModel):
         return self
 
     def __str__(self) -> str:
-        """
-        String representation
-        """
+        """Return a readable summary of the maze configuration."""
 
         return f"Height: {self.height}\n" \
             f"Width: {self.width}\n" \
@@ -105,8 +111,13 @@ class MazeConfiguration(BaseModel):
 
 
 def get_config(config_file: str) -> MazeConfiguration:
-    """
-    Get configuration from config file
+    """Read and validate a maze configuration from a file.
+
+    Args:
+        config_file: Path to the configuration file.
+
+    Returns:
+        A parsed and validated ``MazeConfiguration`` object.
     """
 
     parser = ConfigParser()

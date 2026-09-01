@@ -1,3 +1,5 @@
+"""Interactive console menus for generating, viewing, and managing mazes."""
+
 import maze_generator
 
 import maze_visualizer
@@ -19,6 +21,12 @@ def _visualizer_route_update(
         maze_generator: maze_generator.MazeGenerator,
         visualizer: maze_visualizer.MazeVisualizer
 ) -> None:
+    """Update the visualizer route based on the current maze solution.
+
+    Args:
+        maze_generator: Maze generator instance with the current maze state.
+        visualizer: Visualizer whose route should be refreshed.
+    """
 
     solution = path_finder.path_finder(
         maze_generator.maze,
@@ -26,6 +34,8 @@ def _visualizer_route_update(
         maze_generator.EXIT,
         maze_generator.WIDTH
     )
+    visualizer.start = helper_f.convert_pos(maze_generator.ENTRY)
+    visualizer.end = helper_f.convert_pos(maze_generator.EXIT)
     route = helper_f.plot_route(visualizer.start, solution)
     visualizer.full_route = route
 
@@ -34,6 +44,12 @@ def interactive_menu(
         maze_generator: maze_generator.MazeGenerator,
         visualizer: maze_visualizer.MazeVisualizer,
 ) -> None:
+    """Run the interactive menu loop for maze generation and navigation.
+
+    Args:
+        maze_generator: Generator controlling the current maze structure.
+        visualizer: Renderer used to display the maze and route.
+    """
 
     animation_toggle = 0
     original = 1
@@ -128,11 +144,11 @@ def interactive_menu(
             case "8":  # Re-load config
                 maze_generator = helper_f.load_config(sys.argv[1])
                 helper_f.clear()
-                visualizer.start = helper_f.convert_pos(maze_generator.ENTRY)
-                visualizer.end = helper_f.convert_pos(maze_generator.EXIT)
                 helper_f.visualize_generation(
                                         0, maze_generator, visualizer
                                     )
+                visualizer.show_path = False
+                _visualizer_route_update(maze_generator, visualizer)
             case "9":  # Exit
                 transcripter.transcripter(maze_generator)
                 print("Exiting program.")

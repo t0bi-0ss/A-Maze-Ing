@@ -1,3 +1,7 @@
+"""
+Helpers to trim dead ends from the generated maze while preserving boundaries.
+"""
+
 from .mazecell import Maze, MazeCell
 
 from .directions import Directions, validate_direction
@@ -8,8 +12,13 @@ from .exceptions import InvalidDirection
 
 
 def _count_walls(cell: MazeCell) -> int:
-    """
-    Counts number of walls present in cell
+    """Count how many walls are still present in a cell.
+
+    Args:
+        cell: Maze cell to inspect.
+
+    Returns:
+        Number of active walls on the cell.
     """
 
     counter = 0
@@ -27,8 +36,12 @@ def _build_path(
         neighbor_cell: MazeCell,
         dir: Directions
 ) -> None:
-    """
-    Builds path between current_cell and neighbor_cell according to dir
+    """Open a passage between two adjacent cells in a chosen direction.
+
+    Args:
+        current_cell: The cell being modified.
+        neighbor_cell: The adjacent cell to connect to.
+        dir: Direction from the current cell to the neighbor.
     """
 
     match dir.value:
@@ -50,9 +63,16 @@ def _build_path(
 
 
 def _is_a_corner(maze: Maze, cell: MazeCell, width: int, height: int) -> int:
-    """
-    Checks if index corresponds to a cell located on either of the four corners
-    of the maze, and deletes corresponding walls if it's true
+    """Check whether a cell is one of the maze's corners.
+
+    Args:
+        maze: Maze grid.
+        cell: Cell to inspect.
+        width: Maze width.
+        height: Maze height.
+
+    Returns:
+        1 if the cell is a corner, otherwise 0.
     """
 
     # Top left corner
@@ -82,8 +102,14 @@ def _is_a_corner(maze: Maze, cell: MazeCell, width: int, height: int) -> int:
 def _delete_walls(
         maze: Maze, cell: MazeCell, width: int, height: int, rng: random.Random
 ) -> None:
-    """
-    Deletes a 'dead end'
+    """Remove a dead-end connection from a cell in random valid directions.
+
+    Args:
+        maze: Maze grid.
+        cell: Current dead-end cell.
+        width: Maze width.
+        height: Maze height.
+        rng: Random generator used to choose directions.
     """
 
     directions = [direction for direction in Directions]
@@ -113,8 +139,14 @@ def dead_end_deleter(
         height: int,
         rng: random.Random
 ) -> None:
-    """
-    Searches maze for 'dead ends' and deletes them all
+    """Remove dead ends from a maze cell when it becomes a three-wall junction.
+
+    Args:
+        maze: Maze grid.
+        cell: Cell currently being evaluated.
+        width: Maze width.
+        height: Maze height.
+        rng: Random generator used for random wall deletion.
     """
 
     if _is_a_corner(maze, cell, width, height) or cell.static:

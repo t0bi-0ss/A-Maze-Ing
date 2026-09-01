@@ -1,9 +1,12 @@
+"""Direction handling and neighbor validation for maze generation."""
+
 from enum import Enum
 
 from .exceptions import InvalidDirection
 
 
 class Directions(Enum):
+    """Supported movement directions in the maze grid."""
 
     NORTH = 'N'
     EAST = 'E'
@@ -16,8 +19,15 @@ def get_neighbors_index(
         dir: Directions,
         maze_width: int,
 ) -> int:
-    """
-    Returns neighbors index in specified direction
+    """Return the neighbor index for a cell in the given direction.
+
+    Args:
+        c_cell_index: Current cell index in row-major order.
+        dir: Direction to inspect.
+        maze_width: Width of the maze, used to compute row boundaries.
+
+    Returns:
+        The neighbor cell index.
     """
 
     match dir.value:
@@ -37,9 +47,19 @@ def validate_direction(
         maze_width: int,
         maze_height: int
 ) -> int:
-    """
-    Checks if direction is valid considering current cell. Returns neighbors
-    index if True
+    """Validate whether moving in a direction stays within the maze.
+
+    Args:
+        c_cell_index: Current cell index in row-major order.
+        dir: Direction to validate.
+        maze_width: Width of the maze.
+        maze_height: Height of the maze.
+
+    Returns:
+        The neighbor index if the direction is valid.
+
+    Raises:
+        InvalidDirection: If the direction would leave the maze bounds.
     """
 
     total_elements = maze_width * maze_height

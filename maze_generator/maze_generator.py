@@ -1,3 +1,5 @@
+"""Core maze-generation engine and generator state management."""
+
 import random
 
 from .mazecell import MazeCell, Maze
@@ -14,8 +16,14 @@ from .is_coliding import colition_checker
 
 
 def _starting_cell(maze: Maze, rng: random.Random) -> MazeCell:
-    """
-    Selects a random cell from maze to use as a starting point
+    """Choose a non-static maze cell to begin generation.
+
+    Args:
+        maze: Maze grid being generated.
+        rng: Random generator used to pick a starting cell.
+
+    Returns:
+        A valid starting cell with visited status enabled.
     """
 
     cell = rng.choice(maze)
@@ -28,7 +36,7 @@ def _starting_cell(maze: Maze, rng: random.Random) -> MazeCell:
 
 class MazeGenerator:
     """
-    Generates a random maze
+    Generate and manage a maze instance with configurable generation rules.
     """
 
     def __init__(
@@ -45,6 +53,20 @@ class MazeGenerator:
             perfect_centered: bool = True,
             output_file: str = "maze.txt"
     ) -> None:
+        """Initialize the maze generator.
+
+        Args:
+            width: Maze width in cells.
+            height: Maze height in cells.
+            entry: Entry coordinates as ``(row, col)``.
+            exit: Exit coordinates as ``(row, col)``.
+            selector: Growth strategy selector for the generator.
+            perfect: Whether to keep the maze fully perfect.
+            seed: Random seed for reproducible generation.
+            perfect_centered: Whether the fixed center pattern should stay
+            centered.
+            output_file: File path used when exporting the maze.
+        """
         self.WIDTH = width
         self.HEIGHT = height
         self.ENTRY = entry
@@ -62,8 +84,10 @@ class MazeGenerator:
         self.OUTPUT_FILE = output_file
 
     def gen_maze(self) -> Generator[Maze, None, None]:
-        """
-        Returns a Maze generator
+        """Yield the maze state as it is progressively generated.
+
+        Yields:
+            The current maze state after each generation step.
         """
 
         visited_cells = [_starting_cell(self.maze, self.rng)]

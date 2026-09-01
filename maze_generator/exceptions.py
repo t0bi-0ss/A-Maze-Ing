@@ -1,28 +1,21 @@
+"""Custom exceptions used during maze generation."""
+
+
 class EmptyVisitedList(Exception):
-    """
-    Exception in case of an empty 'visited' list
-    """
+    """Raised when a visited-cell list is unexpectedly empty."""
 
 
 class InvalidDirection(Exception):
-    """
-    Exception for an invalid Direction
-    """
+    """Raised when a direction leaves the maze bounds or is invalid."""
 
 
 class InvalidNeighbor(Exception):
-    """
-    Exception in case of an invalid neighbor's index
-    """
+    """Raised when a neighbor cell cannot be used for expansion."""
 
 
 class NoValidNeighbors(Exception):
-    """
-    Exception in case no valid neighbors are found
-    """
+    """Raised when no valid neighboring cells are available."""
 
 
 class DeadEnd(Exception):
-    """
-    Exception when a 'dead end' has been reached
-    """
+    """Raised when a dead-end condition is encountered during generation."""

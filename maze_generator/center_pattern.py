@@ -1,3 +1,5 @@
+"""Utilities for placing the fixed center pattern in the maze."""
+
 import random
 
 from .mazecell import Maze
@@ -10,8 +12,15 @@ from time import sleep
 def _locate_center(
         maze_width: int, maze_height: int, rng: random.Random
 ) -> int:
-    """
-    Locates maze's most approximate center
+    """Choose the central cell index for the fixed pattern.
+
+    Args:
+        maze_width: Width of the maze.
+        maze_height: Height of the maze.
+        rng: Random generator used to break ties for even-sized dimensions.
+
+    Returns:
+        The center cell index closest to the intended maze midpoint.
     """
 
     possible_indexes = []
@@ -46,9 +55,17 @@ def _set_static_sequence(
         dir: Directions,
         cells_number: int
 ) -> None:
-    """
-    Sets a number of cells to static in a specific direction and returns last
-    index in the sequence
+    """Mark a contiguous sequence of cells as static.
+
+    Args:
+        maze: Maze grid being updated.
+        maze_width: Width of the maze.
+        starting_index: First cell index for the sequence.
+        dir: Direction of traversal for the sequence.
+        cells_number: Number of cells to mark.
+
+    Returns:
+        The index of the last marked cell.
     """
 
     current_index = starting_index
@@ -62,7 +79,7 @@ def _set_static_sequence(
 def _set_four_pattern(
         maze: Maze, maze_width: int, starting_index: int
 ) -> None:
-    """Sets the 'four' on the '42' pattern"""
+    """Place the "four" segment of the center pattern in the maze."""
 
     # 3 cells down
     starting_index = _set_static_sequence(
@@ -79,9 +96,7 @@ def _set_four_pattern(
 
 
 def _set_two_pattern(maze: Maze, maze_width: int, starting_index: int) -> None:
-    """
-    Sets the 'two' on the '42' pattern
-    """
+    """Place the "two" segment of the center pattern in the maze."""
 
     # 3 cells to the right
     starting_index = _set_static_sequence(
@@ -112,7 +127,15 @@ def pattern(
         perfect_centered: bool,
         rng: random.Random
         ) -> None:
-    """Sets '42' pattern in the maze if possible"""
+    """Set the fixed 42 center pattern when the maze is large enough.
+
+    Args:
+        maze: Maze grid to decorate.
+        maze_width: Width of the maze.
+        maze_height: Height of the maze.
+        perfect_centered: Whether to enforce a centered layout.
+        rng: Random generator used for center placement.
+    """
 
     if maze_width < 9 or maze_height < 8:
         print("ERROR: maze is not big enough to hold the '42' pattern")

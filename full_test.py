@@ -1,3 +1,5 @@
+"""CLI entry point for launching the interactive maze application."""
+
 import maze_visualizer
 
 import sys

@@ -1,3 +1,5 @@
+"""ASCII rendering utilities for visualizing generated mazes and solutions."""
+
 import itertools
 
 # Bitmask
@@ -17,10 +19,17 @@ COLOR_PALETTES: tuple[tuple[str, str, str], ...] = (
 
 
 class MazeVisualizer:
-    """Class responsible for visual representation and interactivity"""
+    """Render a maze as an ASCII layout with optional path highlighting."""
 
     def __init__(self, route: list[tuple[int, int]],
                  start: tuple[int, int], end: tuple[int, int]) -> None:
+        """Initialize the visualizer state and color palette.
+
+        Args:
+            route: Full path coordinates currently associated with the maze.
+            start: Starting cell coordinate.
+            end: Exit cell coordinate.
+        """
         self.full_route = route
         self.start = start
         self.end = end
@@ -31,7 +40,11 @@ class MazeVisualizer:
          self.current_route) = next(self._palette_iterator)
 
     def render_ascii(self, matrix: list[list[int]]) -> None:
-        """Generate a visual representation of the maze"""
+        """Print a maze matrix as a colored ASCII representation.
+
+        Args:
+            matrix: 2D grid of wall-bit values representing the maze.
+        """
 
         if not matrix:
             print("ERROR: The maze matrix is empty")
@@ -248,5 +261,10 @@ class MazeVisualizer:
                   + RESET_COLOR)
 
     def change_color_palette(self) -> None:
+        """Advance to the next predefined color palette.
+
+        This updates the wall, static-block, and route colors used during the
+        next render.
+        """
         (self.current_wall, self.current_42,
          self.current_route) = next(self._palette_iterator)

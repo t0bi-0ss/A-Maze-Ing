@@ -1,3 +1,5 @@
+"""Public pathfinding entry point for the maze solver."""
+
 from maze_generator import Maze
 from .helper_f import select_from_unvisited, set_neighbors_distance, \
     path_to_entrance
@@ -11,18 +13,16 @@ def path_finder(
         exit: tuple[str, str],
         maze_width: int
 ) -> str:
-    """
-    Finds a path from entrance to exit in the maze using Dijkstra's algorithm.
+    """Find a route from the maze entrance to the exit.
 
     Args:
-        maze (Maze): The maze represented as a list of MazeCell objects.
-        entrance (tuple[int, int]): The coordinates of the entrance cell.
-        exit (tuple[int, int]): The coordinates of the exit cell.
-        maze_width (int): The width of the maze.
+        maze: Maze represented as a list of maze cells.
+        entrance: Entry coordinates as ``(row, col)``.
+        exit: Exit coordinates as ``(row, col)``.
+        maze_width: Width of the maze.
 
     Returns:
-        list[str]: A list of directions representing the path from entrance to
-        exit.
+        A sequence of direction characters describing a valid route.
     """
 
     unvisited = [cell for cell in maze if not cell.static]

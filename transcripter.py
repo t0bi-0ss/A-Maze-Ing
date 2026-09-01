@@ -1,3 +1,5 @@
+"""Export maze state and solution data to a text file."""
+
 import sys
 
 from maze_generator import MazeGenerator
@@ -10,9 +12,10 @@ import path_finder
 
 
 def transcripter(maze_generator: MazeGenerator):
-    """
-    Transcripts all MazeCell's walls value in maze into a text file
-    while converting said values to hexadecimal
+    """Write the maze layout, entry and exit, and solution to an output file.
+
+    Args:
+        maze_generator: Maze generator instance containing the maze to export.
     """
 
     # Pass maze values

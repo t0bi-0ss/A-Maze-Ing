@@ -1,3 +1,5 @@
+"""Regression tests covering parser validation and maze generation setup."""
+
 import maze_generator
 import transcripter
 import parser

@@ -1,11 +1,21 @@
+"""
+Collision checks for entry and exit coordinates against static maze cells.
+"""
+
 import sys
 
 from .mazecell import Maze
 
 
 def _get_coordinates(index: int, width: int) -> tuple[int, int]:
-    """
-    Transforms index to a (x, y) format coordinates
+    """Convert a row-major cell index to ``(row, col)`` coordinates.
+
+    Args:
+        index: Linear index of a maze cell.
+        width: Maze width.
+
+    Returns:
+        The corresponding row and column pair.
     """
 
     return index % width, index // width
@@ -17,8 +27,16 @@ def colition_checker(
         exit: tuple[str, str],
         maze_width: int
 ) -> None:
-    """
-    Checks if either entry or exit 'colides' with any of the pattern cells
+    """Ensure the entry and exit do not overlap fixed pattern cells.
+
+    Args:
+        maze: Maze grid containing static pattern cells.
+        entry: Entry coordinates as ``(row, col)`` strings.
+        exit: Exit coordinates as ``(row, col)`` strings.
+        maze_width: Width of the maze.
+
+    Raises:
+        SystemExit: If either entry or exit overlaps a static cell.
     """
 
     pattern_cells = [_get_coordinates(cell.INDEX, maze_width) for

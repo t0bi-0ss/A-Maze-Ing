@@ -1,3 +1,7 @@
+"""
+Utility helpers for maze generation, configuration loading, and route display.
+"""
+
 import subprocess
 import maze_visualizer
 import maze_generator
@@ -9,20 +13,41 @@ import helper_f
 
 
 def get_pos(dir: tuple[str, str]) -> str:
+    """Return a normalized coordinate string from a maze position tuple.
+
+    Args:
+        dir: A pair of coordinates in the form ``(row, col)``.
+
+    Returns:
+        A normalized string formatted as ``"row,col"``.
+    """
 
     res = str(dir[0]).replace(' ', '') + ',' + str(dir[1]).replace(' ', '')
     return res
 
 
 def convert_pos(dir: tuple[str, str]) -> tuple[int, int]:
-    """
-    Converts terminal points to a tuple of ints
+    """Convert a coordinate tuple from strings to integers.
+
+    Args:
+        dir: A coordinate pair stored as strings.
+
+    Returns:
+        The same coordinates converted to integer values.
     """
 
     return int(dir[0]), int(dir[1])
 
 
 def to_hex(num):
+    """Convert a numeric wall mask to its hexadecimal character representation.
+
+    Args:
+        num: Integer value from 0 to 15 representing maze wall bits.
+
+    Returns:
+        The hexadecimal digit as a string, or the original value as a string.
+    """
     match num:
         case 10:
             return 'a'
@@ -41,7 +66,18 @@ def to_hex(num):
 
 
 def plot_route(start: tuple[int, int], steps: str) -> list[tuple[int, int]]:
-    """Take the start and go for the end with the route"""
+    """
+    Build a coordinate path from a starting position following directional
+    steps.
+
+    Args:
+        start: Initial maze position as ``(row, col)``.
+        steps: A string containing movement directions such as ``N``, ``E``,
+        ``S``, and ``W``.
+
+    Returns:
+        A list of visited coordinates including the starting cell.
+    """
     route_coordinates = [start]
     f, c = start
 
@@ -63,13 +99,19 @@ def plot_route(start: tuple[int, int], steps: str) -> list[tuple[int, int]]:
 
 
 def clear() -> None:
+    """Clear the terminal screen."""
     subprocess.run(['clear'])
 
 
 def matrix_converter(maze: list[int], width: int) -> list[list[int]]:
-    """
-    Converts generator's one dimensional matrix to a two dimensional one, while
-    converting each cells value to hexadecimal
+    """Convert a flat maze representation into a row-wise matrix.
+
+    Args:
+        maze: A sequence of maze cells preserving row-major order.
+        width: Number of cells per row.
+
+    Returns:
+        A 2D matrix of cell wall values grouped by row.
     """
 
     matrix = []
@@ -92,8 +134,12 @@ def visualize_generation(
         maze: maze_generator.MazeGenerator,
         visualizer: maze_visualizer.MazeVisualizer
 ) -> None:
-    """
-    In charge of generating a maze and it's visualization
+    """Regenerate and render a maze, optionally with animation.
+
+    Args:
+        animated: Whether to animate the maze generation process.
+        maze: Maze generator instance being rebuilt.
+        visualizer: Visualizer used to render the generated maze.
     """
 
     # Restart maze
@@ -145,6 +191,15 @@ def visualize_generation(
 
 
 def define_selector(algorithm: str) -> int:
+    """Map a maze-generation algorithm name to its selection integer.
+
+    Args:
+        algorithm: Algorithm identifier such as ``gt``, ``prism``, or
+            ``backtracking``.
+
+    Returns:
+        The selector value used by the generation algorithm.
+    """
 
     match algorithm:
         case "gt":
@@ -159,6 +214,14 @@ def define_selector(algorithm: str) -> int:
 def load_config(
         file_name: str
 ) -> maze_generator.MazeGenerator:
+    """Build a maze generator from a configuration file.
+
+    Args:
+        file_name: Path to the maze configuration file.
+
+    Returns:
+        A configured ``MazeGenerator`` instance.
+    """
 
     try:
         configuration = parser.get_config(file_name)

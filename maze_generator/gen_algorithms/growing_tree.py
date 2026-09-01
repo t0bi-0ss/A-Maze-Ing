@@ -1,3 +1,5 @@
+"""Growing-tree maze generation algorithm and related helpers."""
+
 from ..directions import Directions, validate_direction
 
 from ..mazecell import MazeCell, Maze
@@ -11,14 +13,30 @@ from ..exceptions import EmptyVisitedList, \
 def _select_from_visited(
         visited: list[MazeCell], selector: float, rng: random.Random
 ) -> MazeCell:
-    """
-    Selects a cell from 'visited' list according to 'selector'
+    """Choose the next active cell from the visited list.
+
+    Args:
+        visited: Cells visited so far in the growth frontier.
+        selector: Strategy selector controlling random or backtracking
+        behavior.
+        rng: Random number generator.
+
+    Returns:
+        A selected cell from the visited list.
+
+    Raises:
+        EmptyVisitedList: If the frontier has no cells remaining.
     """
 
     def stochastic_round(num: float, rng: random.Random) -> int:
-        """
-        Returns num rounded up or down being it's proper value the chance for
-        either case
+        """Convert a probability to a random binary choice.
+
+        Args:
+            num: Probability threshold between 0 and 1.
+            rng: Random generator.
+
+        Returns:
+            0 or 1 depending on the random draw.
         """
         return 0 if rng.random() < num else 1
 
@@ -37,8 +55,17 @@ def _select_from_visited(
 
 
 def _neighbor_validator(maze: Maze, neighbors_index: int) -> MazeCell:
-    """
-    Returns cell's neighbor cell in 'dir' direction if it's valid
+    """Return a valid unvisited non-static neighbor cell.
+
+    Args:
+        maze: Maze grid.
+        neighbors_index: Candidate neighbor index.
+
+    Returns:
+        The neighboring cell if it can be used for expansion.
+
+    Raises:
+        InvalidNeighbor: If the neighbor is static or already visited.
     """
 
     neighbor = maze[neighbors_index]
@@ -55,8 +82,20 @@ def _return_valid_dir_and_neighbor(
         maze_height: int,
         rng: random.Random
 ) -> tuple[Directions, MazeCell]:
-    """
-    Returns a valid cell's neighbor if any
+    """Find a valid neighbor direction and target cell for expansion.
+
+    Args:
+        current_cell: Cell currently being expanded.
+        maze: Maze grid.
+        maze_width: Maze width.
+        maze_height: Maze height.
+        rng: Random generator for choosing an available direction.
+
+    Returns:
+        The chosen direction and neighbor cell.
+
+    Raises:
+        NoValidNeighbors: If no legal neighbor exists for the current cell.
     """
 
     neighbor = None
@@ -86,8 +125,12 @@ def _build_path(
         neighbor_cell: MazeCell,
         dir: Directions
 ) -> None:
-    """
-    Builds path between current_cell and neighbor_cell according to dir
+    """Open a passage between a cell and one of its neighbors.
+
+    Args:
+        current_cell: Cell being expanded.
+        neighbor_cell: Neighbor that will be connected.
+        dir: Direction of the connection.
     """
 
     match dir.value:
@@ -113,8 +156,18 @@ def _connect_neighbor(
         visited_list: list[MazeCell],
         rng: random.Random
 ) -> int:
-    """
-    Connects 'cell' with one of it's neighbors if possible
+    """Connect a cell to one valid neighboring cell, if possible.
+
+    Args:
+        current_cell: Cell currently being grown from.
+        maze: Maze grid.
+        maze_width: Maze width.
+        maze_height: Maze height.
+        visited_list: Current frontier of visited cells.
+        rng: Random generator controlling neighbor selection.
+
+    Returns:
+        1 if a neighbor was connected, otherwise 0.
     """
 
     try:
@@ -140,8 +193,15 @@ def growing_tree(
         selector: float,
         rng: random.Random
 ) -> None:
-    """
-    Builds next path bewteen cells if possible
+    """Advance the growing-tree algorithm by one expansion step.
+
+    Args:
+        visited: Frontier of visited cells.
+        maze: Maze grid being generated.
+        maze_width: Maze width.
+        maze_height: Maze height.
+        selector: Generation strategy selector.
+        rng: Random generator for expansion choices.
     """
 
     could_connect = 0

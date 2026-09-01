@@ -1,17 +1,23 @@
+"""
+Pathfinding support functions used to compute shortest routes in the maze.
+"""
+
 from maze_generator import MazeCell, Maze
 
 from .exceptions import UnreachableCellsError
 
 
 def select_from_unvisited(unvisited: list[MazeCell]) -> MazeCell:
-    """
-    Selects closest cell to entrance found in the unvisited list.
+    """Choose the nearest reachable cell from the unvisited frontier.
 
     Args:
-        unvisited (list[MazeCell]): A list of unvisited cells.
+        unvisited: Cells not yet finalized during path search.
 
     Returns:
-        MazeCell: The selected cell from the unvisited list.
+        The cell with the smallest distance to the entrance.
+
+    Raises:
+        UnreachableCellsError: If no reachable cells remain in the frontier.
     """
 
     current_cell = None
@@ -36,8 +42,12 @@ def set_neighbors_distance(
     maze_width: int,
     current_cell: MazeCell
 ) -> None:
-    """
-    Sets current cell's neighbors distance to entrance
+    """Update adjacent cells with the distance from the maze entrance.
+
+    Args:
+        maze: Maze grid.
+        maze_width: Maze width.
+        current_cell: Cell whose neighbors should be evaluated.
     """
 
     new_distance = current_cell.distance_to_entrance + 1
@@ -82,8 +92,16 @@ def set_neighbors_distance(
 def _closest_neighbor(
     maze: Maze, current_cell: MazeCell, maze_width: int
 ) -> tuple[MazeCell, str]:
-    """
-    Looks for current_cell's valid neighbor closest to entrance
+    """Find the neighbor closest to the maze entrance.
+
+    Args:
+        maze: Maze grid.
+        current_cell: Cell whose route back toward the entrance is being
+        traced.
+        maze_width: Maze width.
+
+    Returns:
+        A tuple of the neighboring cell and the direction used to reach it.
     """
 
     all_neighbors = []
@@ -126,8 +144,15 @@ def path_to_entrance(
         exit_cell: MazeCell,
         maze_width: int
 ) -> list[str]:
-    """
-    Looks for path from exit to entrance
+    """Trace the shortest path from the exit back to the entrance.
+
+    Args:
+        maze: Maze grid containing computed distances.
+        exit_cell: Goal cell for the route.
+        maze_width: Maze width.
+
+    Returns:
+        A sequence of direction characters from the exit to the entrance.
     """
 
     current_cell = exit_cell
