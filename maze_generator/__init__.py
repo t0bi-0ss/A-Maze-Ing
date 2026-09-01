@@ -6,10 +6,13 @@ from .mazecell import MazeCell, Maze
 
 from .center_pattern import pattern
 
+from .is_coliding import colition_checker
+
 __all__ = [
     "MazeGenerator",
     "dead_end_deleter",
     "MazeCell",
     "Maze",
-    "pattern"
+    "pattern",
+    "colition_checker"
 ]

@@ -1,11 +1,11 @@
 import sys
 
-from maze_generator import Maze
+from maze_generator import MazeGenerator
 
 from helper_f import get_pos, to_hex
 
 
-def transcripter(maze: Maze, output_file_name: str, solution: str = None):
+def transcripter(maze: MazeGenerator, solution: str = None):
     """
     Transcripts all MazeCell's walls value in maze into a text file
     while converting said values to hexadecimal
@@ -35,7 +35,7 @@ def transcripter(maze: Maze, output_file_name: str, solution: str = None):
         res += solution
 
     try:
-        with open(output_file_name, 'w') as f:
+        with open(maze.OUTPUT_FILE, 'w') as f:
             f.write(res)
     except (
                 UnicodeDecodeError,

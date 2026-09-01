@@ -1,9 +1,9 @@
-WIDTH = 
-height = 3
-entry = 1, 2
+WIDTH = 12
+height = 12
+entry = 1,1
 EXIT = 2,1
 output_file = 15555
-perfect = 0
+perfect = TRUE
 seed = 2
-algorithm = backtracking
-perfect_centered = 1
+algorithm = prism
+perfect_centered = 0

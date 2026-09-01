@@ -112,17 +112,29 @@ def visualize_generation(
         maze.rng
     )
 
+    # Check for colition
+    maze_generator.colition_checker(
+        maze.maze,
+        maze.ENTRY,
+        maze.EXIT,
+        maze.WIDTH
+    )
+
     # Restart generator
     maze.generator = maze.gen_maze
 
+    from collections import deque
     if animated:
-        for frame in maze.generator():
-            clear()
-            converted_matrix = matrix_converter(frame, maze.WIDTH)
-            visualizer.render_ascii(converted_matrix)
-            sleep(.1)
+        try:
+            for frame in maze.generator():
+                clear()
+                converted_matrix = matrix_converter(frame, maze.WIDTH)
+                visualizer.render_ascii(converted_matrix)
+                sleep(.05)
+        except KeyboardInterrupt:
+            print("\nMaze generation interrupted")
+            sys.exit()
     else:
-        from collections import deque
 
         deque(maze.generator(), maxlen=0)
         converted_matrix = matrix_converter(
@@ -162,6 +174,7 @@ def load_config(
                 perfect=configuration.perfect,
                 seed=configuration.seed,
                 perfect_centered=configuration.perfect_centered,
-                selector=helper_f.define_selector(configuration.algorithm)
+                selector=helper_f.define_selector(configuration.algorithm),
+                output_file=configuration.output_file
             )
     return maze

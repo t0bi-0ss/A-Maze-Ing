@@ -124,8 +124,10 @@ def interactive_menu(
                     maze_generator.EXIT,
                     maze_generator.WIDTH
                 )
-                transcripter.transcripter(maze_generator, "maze.txt", solution)
+                transcripter.transcripter(maze_generator, solution)
                 maze_generator.rng = random.Random(maze_generator.SEED)
+                print(f'Content saved to "{maze_generator.OUTPUT_FILE}"')
+                sleep(2)
                 helper_f.visualize_generation(
                     0, maze_generator, visualizer
                 )

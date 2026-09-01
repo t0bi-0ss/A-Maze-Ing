@@ -42,7 +42,8 @@ class MazeGenerator:
             seed: int | float |
             str | bytes |
             bytearray | None = None,
-            perfect_centered: bool = True
+            perfect_centered: bool = True,
+            output_file: str = "maze.txt"
     ) -> None:
         self.WIDTH = width
         self.HEIGHT = height
@@ -56,8 +57,9 @@ class MazeGenerator:
         self.maze = [MazeCell(element_num) for element_num
                      in range(0, self.WIDTH * self.HEIGHT)]
         pattern(self.maze, self.WIDTH, self.HEIGHT, self.PCENTERED, self.rng)
-        colition_checker(self.maze, self.ENTRY, self.EXIT, self.WIDTH)
+        colition_checker((self.maze), self.ENTRY, self.EXIT, self.WIDTH)
         self.generator = self.gen_maze
+        self.OUTPUT_FILE = output_file
 
     def gen_maze(self) -> Generator[Maze, None, None]:
         """

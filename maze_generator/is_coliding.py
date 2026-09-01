@@ -13,8 +13,8 @@ def _get_coordinates(index: int, width: int) -> tuple[int, int]:
 
 def colition_checker(
         maze: Maze,
-        entry: tuple[int, int],
-        exit: tuple[int, int],
+        entry: tuple[str, str],
+        exit: tuple[str, str],
         maze_width: int
 ) -> None:
     """
@@ -23,6 +23,8 @@ def colition_checker(
 
     pattern_cells = [_get_coordinates(cell.INDEX, maze_width) for
                      cell in maze if cell.static]
+    entry = int(entry[0]), int(entry[1])
+    exit = int(exit[0]), int(exit[1])
 
     if entry in pattern_cells or exit in pattern_cells:
         print(
