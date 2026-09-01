@@ -157,7 +157,7 @@ def get_config(config_file: str) -> MazeConfiguration:
         if loc:
             message = f"{loc[0].upper()} = {input}: {msg_d['msg']}"
         else:
-            message = f"{msg_d['msg'].removeprefix("Value error, ")}"
+            message = f"{msg_d['msg'].removeprefix('Value error, ')}"
         raise SystemExit(
             "ERROR: invalid option " + message
         )

@@ -38,6 +38,7 @@ def interactive_menu(
             "Next Color Combination",
             "Recover original maze",
             "Generate output file",
+            "Re-load config",
             "Exit"
         ]
         print("\n=== A-Maze-ing Interactive Menu ===")
@@ -128,7 +129,15 @@ def interactive_menu(
                 helper_f.visualize_generation(
                     0, maze_generator, visualizer
                 )
-            case "8":  # Exit
+            case "8":
+                maze_generator = helper_f.load_config(sys.argv[1])
+                helper_f.clear()
+                visualizer.start = helper_f.convert_pos(maze_generator.ENTRY)
+                visualizer.end = helper_f.convert_pos(maze_generator.EXIT)
+                helper_f.visualize_generation(
+                                        0, maze_generator, visualizer
+                                    )
+            case "9":  # Exit
                 print("Exiting program.")
                 break
             case _:

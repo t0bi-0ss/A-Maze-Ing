@@ -28,8 +28,10 @@ def _select_from_visited(
         selector = rng.random()
     if 0 < selector < 1:
         selector = stochastic_round(selector, rng)
+    # Prism
     if selector == 1:
         return rng.choice(visited)
+    # Backtracking
     elif selector == 0:
         return visited[-1]
 

@@ -1,9 +1,9 @@
-WIDTH = 10
-height = 10
+WIDTH = 3
+height = 3
 entry = 1, 2
-EXIT = 9,8
+EXIT = 2,1
 output_file = 15555
 perfect = 0
-# seed = 2
-# algorithm = gt
+seed = 2
+algorithm = backtracking
 perfect_centered = 1

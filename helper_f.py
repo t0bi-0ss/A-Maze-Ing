@@ -2,6 +2,10 @@ import subprocess
 import maze_visualizer
 import maze_generator
 import random
+from time import sleep
+import parser
+import sys
+import helper_f
 
 
 def get_pos(dir: tuple[str, str]) -> str:
@@ -116,6 +120,7 @@ def visualize_generation(
             clear()
             converted_matrix = matrix_converter(frame, maze.WIDTH)
             visualizer.render_ascii(converted_matrix)
+            sleep(.1)
     else:
         from collections import deque
 
@@ -125,3 +130,38 @@ def visualize_generation(
             )
         clear()
         visualizer.render_ascii(converted_matrix)
+
+
+def define_selector(algorithm: str) -> int:
+
+    match algorithm:
+        case "gt":
+            res = -1
+        case "prism":
+            res = 1
+        case "backtracking":
+            res = 0
+    return res
+
+
+def load_config(
+        file_name: str
+) -> maze_generator.MazeGenerator:
+
+    try:
+        configuration = parser.get_config(file_name)
+    except SystemExit as msg:
+        print(msg)
+        sys.exit()
+    else:
+        maze = maze_generator.MazeGenerator(
+                width=configuration.width,
+                height=configuration.height,
+                entry=configuration.entry,
+                exit=configuration.exit,
+                perfect=configuration.perfect,
+                seed=configuration.seed,
+                perfect_centered=configuration.perfect_centered,
+                selector=helper_f.define_selector(configuration.algorithm)
+            )
+    return maze

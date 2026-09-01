@@ -1,8 +1,4 @@
-import maze_generator
-
 import maze_visualizer
-
-import parser
 
 import sys
 
@@ -23,21 +19,10 @@ if __name__ == "__main__":
         print("ERROR: 2 files needed")
         sys.exit()
 
-    try:
-        configuration = parser.get_config(sys.argv[1])
-    except SystemExit as msg:
-        print(msg)
-        sys.exit()
-    else:
-        maze = maze_generator.MazeGenerator(
-                width=configuration.width,
-                height=configuration.height,
-                entry=configuration.entry,
-                exit=configuration.exit,
-                perfect=configuration.perfect,
-                seed=configuration.seed,
-                perfect_centered=configuration.perfect_centered
-            )
+    # Config file name
+    config_name = sys.argv[1]
+
+    maze = helper_f.load_config(config_name)
 
     # Get generators final result
     deque(maze.generator(), maxlen=0)
