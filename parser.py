@@ -24,8 +24,8 @@ class MazeConfiguration(BaseModel):
     BaseModel for maze configuration
     """
 
-    width: int = Field(gt=2, le=42)
-    height: int = Field(gt=2, le=42)
+    width: int = Field(gt=2, le=25)
+    height: int = Field(gt=2, le=25)
     entry: tuple[str, str]
     exit: tuple[str, str]
     output_file: str = Field(

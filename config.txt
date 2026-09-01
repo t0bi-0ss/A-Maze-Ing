@@ -1,4 +1,4 @@
-WIDTH = 3
+WIDTH = 
 height = 3
 entry = 1, 2
 EXIT = 2,1
