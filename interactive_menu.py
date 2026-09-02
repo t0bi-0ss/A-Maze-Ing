@@ -8,8 +8,6 @@ import path_finder
 
 import helper_f
 
-import random
-
 import sys
 
 import transcripter
@@ -83,71 +81,78 @@ def interactive_menu(
         match choice:
             case "1":  # Toggle animation
                 animation_toggle = not animation_toggle
-                helper_f.clear()
-                visualizer.show_path = False
-                visualizer.render_ascii(
-                    matrix=helper_f.matrix_converter(
-                        maze_generator.maze,
-                        maze_generator.WIDTH
-                        )
+                helper_f.maze_rendering(
+                    maze=maze_generator,
+                    visualizer=visualizer
                 )
-            case "2":  # Re-generate
-                helper_f.visualize_generation(
-                    animation_toggle, maze_generator, visualizer
+            case "2":  # Re-generate and visualize
+                helper_f.regenerate_maze(
+                    maze=maze_generator,
+                )
+                helper_f.maze_rendering(
+                    maze=maze_generator,
+                    visualizer=visualizer,
+                    animated=animation_toggle
                 )
             case "3":  # New maze
-                visualizer.show_path = 0
                 original = 0
-                maze_generator.SEED = random.random()
-                helper_f.visualize_generation(
-                    animation_toggle, maze_generator, visualizer
+                helper_f.regenerate_maze(
+                    maze=maze_generator,
+                    new_maze=True
+                )
+                helper_f.maze_rendering(
+                    maze=maze_generator,
+                    visualizer=visualizer,
+                    animated=animation_toggle
                 )
                 _visualizer_route_update(maze_generator, visualizer)
             case "4":  # Solution path
-                helper_f.clear()
-                visualizer.show_path = not visualizer.show_path
-                visualizer.render_ascii(
-                    matrix=helper_f.matrix_converter(
-                        maze_generator.maze,
-                        maze_generator.WIDTH
-                        )
+                helper_f.maze_rendering(
+                    maze=maze_generator,
+                    visualizer=visualizer,
+                    show_path=not visualizer.show_path
                 )
             case "5":  # Color
                 helper_f.clear()
                 visualizer.change_color_palette()
-                visualizer.render_ascii(
-                    matrix=helper_f.matrix_converter(
-                        maze_generator.maze,
-                        maze_generator.WIDTH
-                        )
+                helper_f.maze_rendering(
+                    maze=maze_generator,
+                    visualizer=visualizer
                 )
             case "6":  # Original
                 if original:
                     print("Current maze is already the original one")
                     sleep(2)
-                    helper_f.visualize_generation(
-                        0, maze_generator, visualizer
+                    helper_f.maze_rendering(
+                        maze=maze_generator,
+                        visualizer=visualizer
                     )
                 else:
                     original = 1
                     maze_generator.SEED = original_seed
-                    helper_f.visualize_generation(
-                        animation_toggle, maze_generator, visualizer
+                    helper_f.regenerate_maze(
+                        maze=maze_generator
+                    )
+                    helper_f.maze_rendering(
+                        maze=maze_generator,
+                        visualizer=visualizer,
+                        animated=animation_toggle
                     )
                     _visualizer_route_update(maze_generator, visualizer)
             case "7":  # Output file
                 transcripter.transcripter(maze_generator)
-                maze_generator.rng = random.Random(maze_generator.SEED)
-                helper_f.visualize_generation(
-                    0, maze_generator, visualizer
+                # maze_generator.rng = random.Random(maze_generator.SEED)
+                helper_f.maze_rendering(
+                    maze=maze_generator,
+                    visualizer=visualizer,
                 )
             case "8":  # Re-load config
                 maze_generator = helper_f.load_config(sys.argv[1])
-                helper_f.clear()
-                helper_f.visualize_generation(
-                                        0, maze_generator, visualizer
-                                    )
-                visualizer.show_path = False
+                helper_f.maze_rendering(
+                                    maze=maze_generator,
+                                    visualizer=visualizer,
+                                    animated=animation_toggle
+                                )
                 _visualizer_route_update(maze_generator, visualizer)
             case "9":  # Exit
                 transcripter.transcripter(maze_generator)

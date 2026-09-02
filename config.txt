@@ -1,9 +1,9 @@
-WIDTH = 15
+WIDTH=15
 height = 15
-entry = 1,1
-EXIT = 2,3
-output_file = sdfásdf
-perfect = 0
-seed = 2
-algorithm = prism
+entry = 0,0
+EXIT = 7,8
+output_file = maze.txt
+perfect = 1
+#seed = 2
+algorithm = gt
 perfect_centered = 0

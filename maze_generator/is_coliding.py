@@ -17,8 +17,7 @@ def _get_coordinates(index: int, width: int) -> tuple[int, int]:
     Returns:
         The corresponding row and column pair.
     """
-
-    return index % width, index // width
+    return index // width, index % width
 
 
 def colition_checker(

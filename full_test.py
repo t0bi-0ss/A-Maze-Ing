@@ -43,7 +43,12 @@ if __name__ == "__main__":
 
     # Initiate visualizer
     visualizer = maze_visualizer.MazeVisualizer(route, start, end)
-    visualizer.render_ascii(helper_f.matrix_converter(maze.maze, maze.WIDTH))
+
+    # First rendering
+    helper_f.maze_rendering(
+        maze=maze,
+        visualizer=visualizer
+    )
 
     # Restart rng
     maze.rng = random.Random(maze.SEED)

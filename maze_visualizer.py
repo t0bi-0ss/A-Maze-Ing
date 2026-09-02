@@ -1,6 +1,7 @@
 """ASCII rendering utilities for visualizing generated mazes and solutions."""
 
 import itertools
+import maze_generator
 
 # Bitmask
 WALL_NORTH = 1 << 0  # 0001
@@ -39,18 +40,21 @@ class MazeVisualizer:
         (self.current_wall, self.current_42,
          self.current_route) = next(self._palette_iterator)
 
-    def render_ascii(self, matrix: list[list[int]]) -> None:
+    def render_ascii(self, maze: maze_generator.Maze, width: int) -> None:
         """Print a maze matrix as a colored ASCII representation.
 
         Args:
-            matrix: 2D grid of wall-bit values representing the maze.
+            maze: 2D list of wall-bit values representing the maze.
         """
 
-        if not matrix:
-            print("ERROR: The maze matrix is empty")
+        import helper_f
+
+        if not maze:
+            print("ERROR: The maze is empty")
             return
         valid_rows = []
-        common_width = len(matrix[0])
+        common_width = width
+        matrix = helper_f.matrix_converter(maze, width)
         for row in matrix:
             if (isinstance(row, list) and len(row) > 0 and
                     (all(isinstance(x, int) for x in row)) and
@@ -62,7 +66,7 @@ class MazeVisualizer:
             print("Error: The maze matrix is invalid.")
             return
 
-        columns = len(matrix[0])
+        columns = width
         RESET_COLOR = "\033[0m"
 
         # Start and end blocks

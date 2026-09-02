@@ -103,7 +103,11 @@ def _closest_neighbor(
     Returns:
         A tuple of the neighboring cell and the direction used to reach it.
     """
-
+    print("\n\nCurrent cell:\n")
+    print(f"walls: {current_cell.walls}")
+    print(f"index: {current_cell.INDEX}")
+    print(f"static: {current_cell.static}")
+    input("f:")
     all_neighbors = []
 
     # Check if North wall is present
@@ -127,7 +131,6 @@ def _closest_neighbor(
         all_neighbors.append((west_neighbor, "E"))
 
     closest_neighbor = None
-
     for neighbor in all_neighbors:
         if (
             not closest_neighbor
@@ -162,5 +165,4 @@ def path_to_entrance(
         closest_neighbor = _closest_neighbor(maze, current_cell, maze_width)
         path = closest_neighbor[1] + path
         current_cell = closest_neighbor[0]
-
     return path

@@ -10,6 +10,7 @@ from time import sleep
 import parser
 import sys
 import helper_f
+from collections import deque
 
 
 def get_pos(dir: tuple[str, str]) -> str:
@@ -129,22 +130,23 @@ def matrix_converter(maze: list[int], width: int) -> list[list[int]]:
     return matrix
 
 
-def visualize_generation(
-        animated: int,
+def regenerate_maze(
         maze: maze_generator.MazeGenerator,
-        visualizer: maze_visualizer.MazeVisualizer
+        new_maze: bool = False
 ) -> None:
-    """Regenerate and render a maze, optionally with animation.
-
-    Args:
-        animated: Whether to animate the maze generation process.
-        maze: Maze generator instance being rebuilt.
-        visualizer: Visualizer used to render the generated maze.
+    """
+    Regenate a maze, optionally setting a new seed
     """
 
+    # New maze?
+    if new_maze:
+        maze.SEED = random.random()
+
     # Restart maze
-    maze.maze = [maze_generator.MazeCell(element_num) for element_num
-                 in range(0, maze.WIDTH * maze.HEIGHT)]
+    maze.maze = [
+        maze_generator.MazeCell(element_num) for element_num
+        in range(0, maze.WIDTH * maze.HEIGHT)
+        ]
 
     # Restart rng
     maze.rng = random.Random(maze.SEED)
@@ -169,13 +171,35 @@ def visualize_generation(
     # Restart generator
     maze.generator = maze.gen_maze
 
-    from collections import deque
+
+def maze_rendering(
+        maze: maze_generator.MazeGenerator,
+        visualizer: maze_visualizer.MazeVisualizer,
+        show_path: bool = False,
+        animated: bool = False,
+) -> None:
+    """Regenerate and render a maze, optionally with animation.
+
+    Args:
+        animated: Whether to animate the maze generation process.
+        maze: Maze generator instance being rebuilt.
+        visualizer: Visualizer used to render the generated maze.
+    """
+
+    # Show path?
+    if show_path:
+        visualizer.show_path = True
+    else:
+        visualizer.show_path = False
+
     if animated:
         try:
             for frame in maze.generator():
                 clear()
-                converted_matrix = matrix_converter(frame, maze.WIDTH)
-                visualizer.render_ascii(converted_matrix)
+                visualizer.render_ascii(
+                    maze=maze.maze,
+                    width=maze.WIDTH
+                )
                 sleep(.05)
         except KeyboardInterrupt:
             print("\nMaze generation interrupted")
@@ -183,11 +207,11 @@ def visualize_generation(
     else:
 
         deque(maze.generator(), maxlen=0)
-        converted_matrix = matrix_converter(
-            maze.maze, maze.WIDTH
-            )
         clear()
-        visualizer.render_ascii(converted_matrix)
+        visualizer.render_ascii(
+            maze=maze.maze,
+            width=maze.WIDTH
+        )
 
 
 def define_selector(algorithm: str) -> int:

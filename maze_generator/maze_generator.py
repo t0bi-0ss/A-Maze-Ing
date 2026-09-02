@@ -79,7 +79,7 @@ class MazeGenerator:
         self.maze = [MazeCell(element_num) for element_num
                      in range(0, self.WIDTH * self.HEIGHT)]
         pattern(self.maze, self.WIDTH, self.HEIGHT, self.PCENTERED, self.rng)
-        colition_checker((self.maze), self.ENTRY, self.EXIT, self.WIDTH)
+        colition_checker(self.maze, self.ENTRY, self.EXIT, self.WIDTH)
         self.generator = self.gen_maze
         self.OUTPUT_FILE = output_file
 
