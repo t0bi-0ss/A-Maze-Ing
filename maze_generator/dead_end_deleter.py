@@ -99,6 +99,34 @@ def _is_a_corner(maze: Maze, cell: MazeCell, width: int, height: int) -> int:
         return 0
 
 
+def _get_middle_direction(
+        valid_directions_dict: dict[Directions, int]
+) -> None:
+
+    valid_directions_set = set(valid_directions_dict.keys())
+
+    if not {Directions.NORTH, Directions.EAST, Directions.SOUTH}.difference(
+        valid_directions_set
+    ):
+        del valid_directions_dict[Directions.NORTH]
+        del valid_directions_dict[Directions.SOUTH]
+    elif not {Directions.EAST, Directions.SOUTH, Directions.WEST}.difference(
+            valid_directions_set
+    ):
+        del valid_directions_dict[Directions.EAST]
+        del valid_directions_dict[Directions.WEST]
+    elif not {Directions.SOUTH, Directions.WEST, Directions.NORTH}.difference(
+            valid_directions_set
+    ):
+        del valid_directions_dict[Directions.SOUTH]
+        del valid_directions_dict[Directions.NORTH]
+    elif not {Directions.SOUTH, Directions.WEST, Directions.NORTH}.difference(
+            valid_directions_set
+    ):
+        del valid_directions_dict[Directions.SOUTH]
+        del valid_directions_dict[Directions.NORTH]
+
+
 def _delete_walls(
         maze: Maze, cell: MazeCell, width: int, height: int, rng: random.Random
 ) -> None:
@@ -113,23 +141,66 @@ def _delete_walls(
     """
 
     directions = [direction for direction in Directions]
+    valid_directions_and_neighbor_index = {}
 
-    while len(directions):
-        dir = rng.choice(directions)
+    for dir in directions:
         try:
-            neighbors_index = validate_direction(
+            valid_index = validate_direction(
                 cell.INDEX, dir, width, height
-                )
+            )
         except InvalidDirection:
-            directions.remove(dir)
             continue
         else:
-            if maze[neighbors_index].static:
-                directions.remove(dir)
-                continue
-            else:
-                _build_path(cell, maze[neighbors_index], dir)
-                directions.remove(dir)
+            valid_directions_and_neighbor_index[dir] = valid_index
+
+    if not cell.walls & 1 \
+            and Directions.NORTH in valid_directions_and_neighbor_index:
+        del valid_directions_and_neighbor_index[Directions.NORTH]
+    if not cell.walls & 2 \
+            and Directions.EAST in valid_directions_and_neighbor_index:
+        del valid_directions_and_neighbor_index[Directions.EAST]
+    if not cell.walls & 4 \
+            and Directions.SOUTH in valid_directions_and_neighbor_index:
+        del valid_directions_and_neighbor_index[Directions.SOUTH]
+    if not cell.walls & 8 \
+            and Directions.WEST in valid_directions_and_neighbor_index:
+        del valid_directions_and_neighbor_index[Directions.WEST]
+
+    are_static = []
+    for key, value in valid_directions_and_neighbor_index.items():
+        if maze[value].static:
+            are_static.append(key)
+
+    if are_static:
+        for key in are_static:
+            del valid_directions_and_neighbor_index[key]
+
+    if len(valid_directions_and_neighbor_index) == 3:
+        _get_middle_direction(valid_directions_and_neighbor_index)
+
+    if valid_directions_and_neighbor_index:
+        selected_dir = rng.choice(list(
+            valid_directions_and_neighbor_index.items()
+            ))
+
+        _build_path(cell, maze[selected_dir[1]], selected_dir[0])
+
+    # while len(directions):
+    #     dir = rng.choice(directions)
+    #     try:
+    #         neighbors_index = validate_direction(
+    #             cell.INDEX, dir, width, height
+    #             )
+    #     except InvalidDirection:
+    #         directions.remove(dir)
+    #         continue
+    #     else:
+    #         if maze[neighbors_index].static:
+    #             directions.remove(dir)
+    #             continue
+    #         else:
+    #             _build_path(cell, maze[neighbors_index], dir)
+    #             directions.remove(dir)
 
 
 def dead_end_deleter(

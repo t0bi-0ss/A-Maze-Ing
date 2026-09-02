@@ -18,8 +18,8 @@ class InvalidTerminalNodesError(Exception):
 class MazeConfiguration(BaseModel):
     """Validated configuration data for generating a maze."""
 
-    width: int = Field(gt=2, le=25)
-    height: int = Field(gt=2, le=25)
+    width: int = Field(gt=2, le=60)
+    height: int = Field(gt=2, le=60)
     entry: tuple[str, str]
     exit: tuple[str, str]
     output_file: str = Field(

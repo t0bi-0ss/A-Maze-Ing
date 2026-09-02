@@ -1,9 +1,9 @@
-WIDTH=15
-height = 15
+WIDTH=20
+height = 20
 entry = 0,0
-EXIT = 7,8
+EXIT = 1,1
 output_file = maze.txt
-perfect = 1
+perfect = 0
 #seed = 2
 algorithm = gt
 perfect_centered = 0

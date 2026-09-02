@@ -103,11 +103,7 @@ def _closest_neighbor(
     Returns:
         A tuple of the neighboring cell and the direction used to reach it.
     """
-    print("\n\nCurrent cell:\n")
-    print(f"walls: {current_cell.walls}")
-    print(f"index: {current_cell.INDEX}")
-    print(f"static: {current_cell.static}")
-    input("f:")
+
     all_neighbors = []
 
     # Check if North wall is present
