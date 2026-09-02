@@ -2,11 +2,10 @@
 
 from configparser import ConfigParser, ParsingError, InterpolationSyntaxError
 
-from pydantic import ValidationError, BaseModel, Field, model_validator
+from pydantic import ValidationError, BaseModel, \
+    Field, model_validator, field_validator
 
 from typing_extensions import Self
-
-from typing import Literal
 
 import random
 
@@ -20,17 +19,35 @@ class MazeConfiguration(BaseModel):
 
     width: int = Field(gt=2, le=60)
     height: int = Field(gt=2, le=60)
-    entry: tuple[str, str]
-    exit: tuple[str, str]
+    entry: tuple[str, ...]
+    exit: tuple[str, ...]
     output_file: str = Field(
         min_length=5,
         max_length=260,
         pattern=r"^[a-zA-Z0-9._-ñ]+$"
     )
-    perfect: bool
+    perfect: bool | str
     seed: str | int | float | bytes | None = None
-    algorithm: Literal["prism", "backtracking", "gt"] = Field(default="gt")
-    perfect_centered: bool
+    algorithm: str
+    perfect_centered: bool | str
+
+    @field_validator("algorithm", mode="before")
+    @classmethod
+    def validate_algorithm(cls, input: str) -> str:
+        allowed_strings = ["prism", "backtracking", "gt"]
+        assert input in allowed_strings
+        return input
+
+    @field_validator("perfect", "perfect_centered", mode="before")
+    @classmethod
+    def validate_string_bool(cls, input: bool | str) -> bool | str:
+        if isinstance(input, str):
+            valid_strings = {"true", "false", "yes", "no", "1", "0"}
+            if input.strip().lower() not in valid_strings:
+                raise ValueError(
+                    f"String '{input}' is not a valid boolean representation"
+                    )
+        return input
 
     @staticmethod
     def validate_pos(
@@ -149,8 +166,8 @@ def get_config(config_file: str) -> MazeConfiguration:
         maze_config = MazeConfiguration(
             width=config_vars['width'],
             height=config_vars['height'],
-            entry=config_vars['entry'].split(','),
-            exit=config_vars['exit'].split(','),
+            entry=tuple(config_vars['entry'].split(',')),
+            exit=tuple(config_vars['exit'].split(',')),
             output_file=config_vars['output_file'],
             perfect=config_vars.get('perfect', False),
             algorithm=config_vars.get('algorithm', 'gt'),
@@ -166,7 +183,7 @@ def get_config(config_file: str) -> MazeConfiguration:
         loc = msg_d.get('loc')
         input = msg_d['input']
         if loc:
-            message = f"{loc[0].upper()} = {input}: {msg_d['msg']}"
+            message = f"{str(loc[0]).upper()} = {input}: {msg_d['msg']}"
         else:
             message = f"{msg_d['msg'].removeprefix('Value error, ')}"
         raise SystemExit(

@@ -40,16 +40,16 @@ def colition_checker(
 
     pattern_cells = [_get_coordinates(cell.INDEX, maze_width) for
                      cell in maze if cell.static]
-    entry = int(entry[0]), int(entry[1])
-    exit = int(exit[0]), int(exit[1])
+    converted_entry = int(entry[0]), int(entry[1])
+    converted_exit = int(exit[0]), int(exit[1])
 
-    if entry in pattern_cells or exit in pattern_cells:
+    if converted_entry in pattern_cells or converted_exit in pattern_cells:
         print(
             "ERROR: unsolvable maze. Either entry or exit coordinates"
             " coincide with one of the '42' pattern cells"
             "\nPattern cells coordinates =",
             pattern_cells,
-            "\nEntry coordinates =", entry,
-            "\nExit coordinates =", exit
+            "\nEntry coordinates =", converted_entry,
+            "\nExit coordinates =", converted_exit
         )
         sys.exit()

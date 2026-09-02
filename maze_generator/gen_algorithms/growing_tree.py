@@ -12,7 +12,7 @@ from ..exceptions import EmptyVisitedList, \
 
 def _select_from_visited(
         visited: list[MazeCell], selector: float, rng: random.Random
-) -> MazeCell:
+) -> MazeCell | None:
     """Choose the next active cell from the visited list.
 
     Args:
@@ -27,6 +27,8 @@ def _select_from_visited(
     Raises:
         EmptyVisitedList: If the frontier has no cells remaining.
     """
+
+    selected_cell = None
 
     def stochastic_round(num: float, rng: random.Random) -> int:
         """Convert a probability to a random binary choice.
@@ -48,10 +50,11 @@ def _select_from_visited(
         selector = stochastic_round(selector, rng)
     # Prism
     if selector == 1:
-        return rng.choice(visited)
+        selected_cell = rng.choice(visited)
     # Backtracking
     elif selector == 0:
-        return visited[-1]
+        selected_cell = visited[-1]
+    return selected_cell
 
 
 def _neighbor_validator(maze: Maze, neighbors_index: int) -> MazeCell:
@@ -81,7 +84,7 @@ def _return_valid_dir_and_neighbor(
         maze_width: int,
         maze_height: int,
         rng: random.Random
-) -> tuple[Directions, MazeCell]:
+) -> tuple[Directions, MazeCell | None]:
     """Find a valid neighbor direction and target cell for expansion.
 
     Args:

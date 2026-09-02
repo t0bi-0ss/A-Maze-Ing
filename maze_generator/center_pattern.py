@@ -24,28 +24,31 @@ def _locate_center(
     """
 
     possible_indexes = []
+    chosen_center = -1
+
     if maze_width % 2 != 0 and maze_height % 2 != 0:
-        return (maze_height // 2) * maze_width + (maze_width // 2)
-    if maze_width % 2 == 0 and maze_height % 2 != 0:
+        chosen_center = (maze_height // 2) * maze_width + (maze_width // 2)
+    elif maze_width % 2 == 0 and maze_height % 2 != 0:
         left_center_index = (maze_height // 2) * \
             maze_width + (maze_width // 2 - 1)
         right_center_index = (maze_height // 2) * \
             maze_width + (maze_width // 2)
         possible_indexes.append(left_center_index)
         possible_indexes.append(right_center_index)
-        return rng.choice(possible_indexes)
-    if maze_width % 2 != 0 and maze_height % 2 == 0:
+        chosen_center = rng.choice(possible_indexes)
+    elif maze_width % 2 != 0 and maze_height % 2 == 0:
         top_center_index = ((maze_height // 2) - 1) \
             * maze_width + (maze_width // 2)
         bottom_center_index = (maze_height // 2) \
             * maze_width + (maze_width // 2)
         possible_indexes.append(top_center_index)
         possible_indexes.append(bottom_center_index)
-        return rng.choice(possible_indexes)
-    if maze_width % 2 == 0 and maze_height % 2 == 0:
+        chosen_center = rng.choice(possible_indexes)
+    elif maze_width % 2 == 0 and maze_height % 2 == 0:
         rows = [maze_height // 2 - 1, maze_height // 2]
         cols = [maze_width // 2 - 1, maze_width // 2]
-        return rng.choice(rows) * maze_width + rng.choice(cols)
+        chosen_center = rng.choice(rows) * maze_width + rng.choice(cols)
+    return chosen_center
 
 
 def _set_static_sequence(
@@ -54,7 +57,7 @@ def _set_static_sequence(
         starting_index: int,
         dir: Directions,
         cells_number: int
-) -> None:
+) -> int:
     """Mark a contiguous sequence of cells as static.
 
     Args:
