@@ -151,9 +151,13 @@ def interactive_menu(
                 helper_f.maze_rendering(
                                     maze=maze_generator,
                                     visualizer=visualizer,
-                                    animated=animation_toggle
                                 )
                 _visualizer_route_update(maze_generator, visualizer)
+                helper_f.maze_rendering(
+                                    maze=maze_generator,
+                                    visualizer=visualizer,
+                                    animated=animation_toggle
+                                )
             case "9":  # Exit
                 transcripter.transcripter(maze_generator)
                 print("Exiting program.")

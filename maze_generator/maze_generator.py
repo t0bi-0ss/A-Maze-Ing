@@ -10,7 +10,7 @@ from .gen_algorithms import growing_tree
 
 from collections.abc import Generator
 
-from .dead_end_deleter import dead_end_deleter
+from .open_dead_end_passage import open_dead_end_passage
 
 from .is_coliding import colition_checker
 
@@ -105,7 +105,7 @@ class MazeGenerator:
         index = 0
         if not self.PERFECT:
             while index < len(self.maze):
-                dead_end_deleter(
+                open_dead_end_passage(
                     self.maze,
                     self.maze[index],
                     self.WIDTH,

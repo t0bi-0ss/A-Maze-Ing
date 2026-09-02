@@ -2,7 +2,7 @@
 
 from .maze_generator import MazeGenerator
 
-from .dead_end_deleter import dead_end_deleter
+from .open_dead_end_passage import open_dead_end_passage
 
 from .mazecell import MazeCell, Maze
 
@@ -12,7 +12,7 @@ from .is_coliding import colition_checker
 
 __all__ = [
     "MazeGenerator",
-    "dead_end_deleter",
+    "open_dead_end_passage",
     "MazeCell",
     "Maze",
     "pattern",

@@ -99,9 +99,15 @@ def _is_a_corner(maze: Maze, cell: MazeCell, width: int, height: int) -> int:
         return 0
 
 
-def _get_middle_direction(
+def _keep_middle_direction(
         valid_directions_dict: dict[Directions, int]
 ) -> None:
+    """Keep only the middle direction in a three-direction choice.
+
+    Args:
+        valid_directions_dict: Available directions and neighboring cell
+            indexes. The mapping is modified in place.
+    """
 
     valid_directions_set = set(valid_directions_dict.keys())
 
@@ -127,17 +133,62 @@ def _get_middle_direction(
         del valid_directions_dict[Directions.NORTH]
 
 
-def _delete_walls(
+def _filter_available_directions(
+        maze: Maze,
+        current_cell: MazeCell,
+        directions_dict: dict[Directions, int]
+) -> None:
+    """Discard directions that cannot create a useful new passage.
+
+    Existing passages and directions leading to static cells are removed from
+    the mapping in place.
+
+    Args:
+        maze: Maze grid used to inspect neighboring cells.
+        current_cell: Cell whose possible passages are being filtered.
+        directions_dict: Available directions and neighboring cell indexes.
+    """
+
+    # Redundant Directions
+    if not current_cell.walls & 1 \
+            and Directions.NORTH in directions_dict:
+        del directions_dict[Directions.NORTH]
+    if not current_cell.walls & 2 \
+            and Directions.EAST in directions_dict:
+        del directions_dict[Directions.EAST]
+    if not current_cell.walls & 4 \
+            and Directions.SOUTH in directions_dict:
+        del directions_dict[Directions.SOUTH]
+    if not current_cell.walls & 8 \
+            and Directions.WEST in directions_dict:
+        del directions_dict[Directions.WEST]
+
+    # Remove Directions pointing to static neighbor
+    are_static = []
+    for key, value in directions_dict.items():
+        if maze[value].static:
+            are_static.append(key)
+    if are_static:
+        for key in are_static:
+            del directions_dict[key]
+
+
+def _open_passage(
         maze: Maze, cell: MazeCell, width: int, height: int, rng: random.Random
 ) -> None:
-    """Remove a dead-end connection from a cell in random valid directions.
+    """Open one useful passage from a dead-end cell.
+
+    Valid in-bounds directions are collected, existing passages and static
+    neighbors are removed, and a middle direction is preferred when three
+    choices remain. The remaining direction is selected with ``rng`` and the
+    passage is opened symmetrically in both cells.
 
     Args:
         maze: Maze grid.
-        cell: Current dead-end cell.
+        cell: Current dead-end cell whose walls may be opened.
         width: Maze width.
         height: Maze height.
-        rng: Random generator used to choose directions.
+        rng: Random generator used to choose among the remaining directions.
     """
 
     directions = [direction for direction in Directions]
@@ -153,57 +204,25 @@ def _delete_walls(
         else:
             valid_directions_and_neighbor_index[dir] = valid_index
 
-    if not cell.walls & 1 \
-            and Directions.NORTH in valid_directions_and_neighbor_index:
-        del valid_directions_and_neighbor_index[Directions.NORTH]
-    if not cell.walls & 2 \
-            and Directions.EAST in valid_directions_and_neighbor_index:
-        del valid_directions_and_neighbor_index[Directions.EAST]
-    if not cell.walls & 4 \
-            and Directions.SOUTH in valid_directions_and_neighbor_index:
-        del valid_directions_and_neighbor_index[Directions.SOUTH]
-    if not cell.walls & 8 \
-            and Directions.WEST in valid_directions_and_neighbor_index:
-        del valid_directions_and_neighbor_index[Directions.WEST]
+    _filter_available_directions(
+        maze,
+        cell,
+        valid_directions_and_neighbor_index
+    )
 
-    are_static = []
-    for key, value in valid_directions_and_neighbor_index.items():
-        if maze[value].static:
-            are_static.append(key)
-
-    if are_static:
-        for key in are_static:
-            del valid_directions_and_neighbor_index[key]
-
+    # Delete all directions except for 'middle'
     if len(valid_directions_and_neighbor_index) == 3:
-        _get_middle_direction(valid_directions_and_neighbor_index)
+        _keep_middle_direction(valid_directions_and_neighbor_index)
 
+    # Build path through either middle direction or random selected
     if valid_directions_and_neighbor_index:
         selected_dir = rng.choice(list(
             valid_directions_and_neighbor_index.items()
             ))
-
         _build_path(cell, maze[selected_dir[1]], selected_dir[0])
 
-    # while len(directions):
-    #     dir = rng.choice(directions)
-    #     try:
-    #         neighbors_index = validate_direction(
-    #             cell.INDEX, dir, width, height
-    #             )
-    #     except InvalidDirection:
-    #         directions.remove(dir)
-    #         continue
-    #     else:
-    #         if maze[neighbors_index].static:
-    #             directions.remove(dir)
-    #             continue
-    #         else:
-    #             _build_path(cell, maze[neighbors_index], dir)
-    #             directions.remove(dir)
 
-
-def dead_end_deleter(
+def open_dead_end_passage(
         maze: Maze,
         cell: MazeCell,
         width: int,
@@ -225,4 +244,4 @@ def dead_end_deleter(
     else:
         walls = _count_walls(cell)
         if walls == 3:
-            _delete_walls(maze, cell, width, height, rng)
+            _open_passage(maze, cell, width, height, rng)
