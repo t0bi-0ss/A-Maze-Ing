@@ -7,8 +7,6 @@ from pydantic import ValidationError, BaseModel, \
 
 from typing_extensions import Self
 
-import random
-
 
 class InvalidTerminalNodesError(Exception):
     """Raised when a maze terminal node is invalid."""
@@ -19,41 +17,86 @@ class MazeConfiguration(BaseModel):
 
     width: int = Field(gt=2, le=60)
     height: int = Field(gt=2, le=60)
-    entry: tuple[str, ...]
-    exit: tuple[str, ...]
+    entry: tuple[int, int]
+    exit: tuple[int, int]
     output_file: str = Field(
         min_length=5,
         max_length=260,
         pattern=r"^[a-zA-Z0-9._-ñ]+$"
     )
-    perfect: bool | str
-    seed: str | int | float | bytes | None = None
-    algorithm: str
-    perfect_centered: bool | str
+    perfect: bool
+    seed: str | int | float | None = None
+    algorithm: str = "gt"
+    perfect_centered: bool = True
+
+    @field_validator("width", "height", mode="before")
+    @classmethod
+    def validate_size(
+        cls,
+        input: str
+    ) -> int:
+        if isinstance(input, str):
+            try:
+                int(input)
+            except ValueError as msg:
+                raise ValueError(msg)
+            else:
+                return int(input)
+        return int(input)
+
+    @field_validator("entry", "exit", mode="before")
+    @classmethod
+    def validate_end_points(
+        cls, input: str
+    ) -> tuple[int, int]:
+
+        input_list = input.split(",")
+        for element in input_list:
+            if isinstance(element, str):
+                if len(input_list) != 2:
+                    raise ValueError(
+                        "Input must have two elements only"
+                    )
+                try:
+                    int(input_list[0])
+                    int(input_list[1])
+                except ValueError as msg:
+                    raise ValueError(msg)
+                else:
+                    return int(input_list[0]), int(input_list[1])
+        return int(input_list[0]), int(input_list[1])
 
     @field_validator("algorithm", mode="before")
     @classmethod
     def validate_algorithm(cls, input: str) -> str:
         allowed_strings = ["prism", "backtracking", "gt"]
-        assert input in allowed_strings
+        try:
+            assert input in allowed_strings
+        except AssertionError:
+            raise AssertionError(f"Allowed strings: {allowed_strings}")
         return input
 
     @field_validator("perfect", "perfect_centered", mode="before")
     @classmethod
-    def validate_string_bool(cls, input: bool | str) -> bool | str:
+    def validate_string_bool(cls, input: str) -> bool:
         if isinstance(input, str):
             valid_strings = {"true", "false", "yes", "no", "1", "0"}
             if input.strip().lower() not in valid_strings:
                 raise ValueError(
                     f"String '{input}' is not a valid boolean representation"
-                    )
-        return input
+                    f"\nValid strings: {valid_strings}"
+                )
+            if input == "yes":
+                return True
+            if input == "no":
+                return False
+        return bool(input)
 
     @staticmethod
     def validate_pos(
         maze_width: int,
         maze_height: int,
-        pos: tuple[str, str],
+        pos: tuple[int, int],
         name: str
     ) -> None:
         """Validate a coordinate pair against maze boundaries.
@@ -69,15 +112,8 @@ class MazeConfiguration(BaseModel):
                 maze bounds.
         """
 
-        # Check if either of it's elements are not an int or negative
-        try:
-            x = int(pos[0])
-            y = int(pos[1])
-        except ValueError as msg:
-            raise ValueError(
-                f"'{name}'\n" + str(msg)
-            )
-
+        x = pos[0]
+        y = pos[1]
         # Check if either of it's elements exceeds maze boundaries
         if x >= maze_height or x < 0:
             raise ValueError(
@@ -102,9 +138,7 @@ class MazeConfiguration(BaseModel):
             ValueError: If the entry or exit cells are invalid or identical.
         """
 
-        entry_copy = [coord.replace(" ", "") for coord in self.entry]
-        exit_copy = [coord.replace(" ", "") for coord in self.exit]
-        if entry_copy == exit_copy:
+        if self.entry == self.exit:
             raise ValueError("Entry and exit coordinates must differ")
         try:
             self.validate_pos(self.width, self.height, self.exit, "EXIT")
@@ -163,17 +197,7 @@ def get_config(config_file: str) -> MazeConfiguration:
     config_vars = dict(parser['TOP'])
 
     try:
-        maze_config = MazeConfiguration(
-            width=config_vars['width'],
-            height=config_vars['height'],
-            entry=tuple(config_vars['entry'].split(',')),
-            exit=tuple(config_vars['exit'].split(',')),
-            output_file=config_vars['output_file'],
-            perfect=config_vars.get('perfect', False),
-            algorithm=config_vars.get('algorithm', 'gt'),
-            seed=config_vars.get('seed', random.random()),
-            perfect_centered=config_vars.get('perfect_centered', True)
-        )
+        maze_config = MazeConfiguration.model_validate(config_vars)
     except KeyError as msg:
         raise SystemExit(
             f"KeyError: key {str(msg).upper()} is missing from config file"

@@ -9,8 +9,8 @@ from .exceptions import UnreachableCellsError
 
 def path_finder(
         maze: Maze,
-        entrance: tuple[str, str],
-        exit: tuple[str, str],
+        entrance: tuple[int, int],
+        exit: tuple[int, int],
         maze_width: int
 ) -> str:
     """Find a route from the maze entrance to the exit.
@@ -27,11 +27,11 @@ def path_finder(
 
     unvisited = [cell for cell in maze if not cell.static]
 
-    entrance_index = int(entrance[0]) * maze_width + int(entrance[1])
+    entrance_index = entrance[0] * maze_width + entrance[1]
     entrance_cell = maze[entrance_index]
     entrance_cell.distance_to_entrance = 0
 
-    exit_index = int(exit[0]) * maze_width + int(exit[1])
+    exit_index = exit[0] * maze_width + exit[1]
     exit_cell = maze[exit_index]
 
     while unvisited:

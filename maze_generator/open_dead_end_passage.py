@@ -218,7 +218,7 @@ def _open_passage(
     if valid_directions_and_neighbor_index:
         selected_dir = rng.choice(list(
             valid_directions_and_neighbor_index.items()
-            ))
+        ))
         _build_path(cell, maze[selected_dir[1]], selected_dir[0])
 
 

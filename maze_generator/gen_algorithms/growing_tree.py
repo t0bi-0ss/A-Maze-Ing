@@ -176,16 +176,17 @@ def _connect_neighbor(
     try:
         dir_and_neighbor = _return_valid_dir_and_neighbor(
             current_cell, maze, maze_width, maze_height, rng
-            )
+        )
     except NoValidNeighbors:
         return 0
     else:
-        neighbor_cell = dir_and_neighbor[1]
-        neighbor_cell.is_now_visited()
-        visited_list.append(neighbor_cell)
-        dir = dir_and_neighbor[0]
-        _build_path(current_cell, neighbor_cell, dir)
-        return 1
+        if dir_and_neighbor[0] and dir_and_neighbor[1]:
+            neighbor_cell = dir_and_neighbor[1]
+            neighbor_cell.is_now_visited()
+            visited_list.append(neighbor_cell)
+            dir = dir_and_neighbor[0]
+            _build_path(current_cell, neighbor_cell, dir)
+    return 1
 
 
 def growing_tree(
@@ -212,10 +213,11 @@ def growing_tree(
     try:
         while not could_connect:
             current_cell = _select_from_visited(visited, selector, rng)
-            could_connect = _connect_neighbor(
-                current_cell, maze, maze_width, maze_height, visited, rng
-            )
-            if not could_connect:
+            if current_cell:
+                could_connect = _connect_neighbor(
+                    current_cell, maze, maze_width, maze_height, visited, rng
+                )
+            if not could_connect and current_cell:
                 visited.remove(current_cell)
     except EmptyVisitedList:
         return

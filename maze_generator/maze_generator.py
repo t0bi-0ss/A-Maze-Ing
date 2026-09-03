@@ -46,7 +46,7 @@ class MazeGenerator:
             entry: tuple[int, int],
             exit: tuple[int, int],
             selector: float = -1,
-            perfect: bool = True,
+            perfect: bool = False,
             seed: int | float |
             str | bytes |
             bytearray | None = None,
@@ -101,7 +101,6 @@ class MazeGenerator:
                 self.SELECTOR,
                 self.rng
             )
-
         index = 0
         if not self.PERFECT:
             while index < len(self.maze):

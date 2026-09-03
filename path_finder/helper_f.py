@@ -91,7 +91,7 @@ def set_neighbors_distance(
 
 def _closest_neighbor(
     maze: Maze, current_cell: MazeCell, maze_width: int
-) -> tuple[MazeCell, str]:
+) -> tuple[MazeCell, str] | None:
     """Find the neighbor closest to the maze entrance.
 
     Args:
@@ -142,7 +142,7 @@ def path_to_entrance(
         maze: Maze,
         exit_cell: MazeCell,
         maze_width: int
-) -> list[str]:
+) -> str:
     """Trace the shortest path from the exit back to the entrance.
 
     Args:
@@ -159,6 +159,7 @@ def path_to_entrance(
 
     while current_cell.distance_to_entrance != 0:
         closest_neighbor = _closest_neighbor(maze, current_cell, maze_width)
-        path = closest_neighbor[1] + path
-        current_cell = closest_neighbor[0]
+        if closest_neighbor:
+            path = closest_neighbor[1] + path
+            current_cell = closest_neighbor[0]
     return path

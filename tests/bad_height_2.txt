@@ -2,7 +2,7 @@
 # optional keys: seed, algorithm, display mode, algorithm, perfect_centered
 
 WIDTH = 20
-height = 43
+height = 100
 entry = 1, 2
 EXIT = 2,3
 output_file = 15555

@@ -87,15 +87,15 @@ def _set_four_pattern(
     # 3 cells down
     starting_index = _set_static_sequence(
         maze, maze_width, starting_index, Directions.SOUTH, 3
-        )
+    )
     # 3 cells to the right
     starting_index = _set_static_sequence(
         maze, maze_width, starting_index, Directions.EAST, 3
-        )
+    )
     # 3 cells down
     starting_index = _set_static_sequence(
         maze, maze_width, starting_index, Directions.SOUTH, 3
-        )
+    )
 
 
 def _set_two_pattern(maze: Maze, maze_width: int, starting_index: int) -> None:
@@ -104,23 +104,23 @@ def _set_two_pattern(maze: Maze, maze_width: int, starting_index: int) -> None:
     # 3 cells to the right
     starting_index = _set_static_sequence(
         maze, maze_width, starting_index, Directions.EAST, 3
-        )
+    )
     # 3 cells down
     starting_index = _set_static_sequence(
         maze, maze_width, starting_index, Directions.SOUTH, 3
-        )
+    )
     # 3 cells to the left
     starting_index = _set_static_sequence(
         maze, maze_width, starting_index, Directions.WEST, 3
-        )
+    )
     # 3 cells down
     starting_index = _set_static_sequence(
         maze, maze_width, starting_index, Directions.SOUTH, 3
-        )
+    )
     # 3 cells to the right
     starting_index = _set_static_sequence(
         maze, maze_width, starting_index, Directions.EAST, 3
-        )
+    )
 
 
 def pattern(
@@ -129,7 +129,7 @@ def pattern(
         maze_height: int,
         perfect_centered: bool,
         rng: random.Random
-        ) -> None:
+) -> None:
     """Set the fixed 42 center pattern when the maze is large enough.
 
     Args:

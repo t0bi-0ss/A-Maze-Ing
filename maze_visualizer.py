@@ -176,7 +176,8 @@ class MazeVisualizer:
                             next_pt = self.full_route[i + 1]
                             if (current == (f, c) and
                                 next_pt == (f, c + 1)) or (
-                                 current == (f, c + 1) and next_pt == (f, c)):
+                                    current == (f, c + 1) and next_pt == (f, c)
+                            ):
                                 next_horizontal = True
                                 break
 
@@ -223,7 +224,8 @@ class MazeVisualizer:
                             next_pt = self.full_route[i + 1]
                             if (current == (f, c) and
                                 next_pt == (f + 1, c)) or (
-                                 current == (f + 1, c) and next_pt == (f, c)):
+                                    current == (f + 1, c) and next_pt == (f, c)
+                            ):
                                 next_vertical = True
                                 break
 

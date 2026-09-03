@@ -4,27 +4,27 @@ import sys
 
 from maze_generator import MazeGenerator
 
-from helper_f import get_pos, to_hex
+from helper_f import to_hex
 
 from time import sleep
 
 import path_finder
 
 
-def transcripter(maze_generator: MazeGenerator):
+def transcripter(maze: MazeGenerator) -> None:
     """Write the maze layout, entry and exit, and solution to an output file.
 
     Args:
-        maze_generator: Maze generator instance containing the maze to export.
+        maze: Maze generator instance containing the maze to export.
     """
 
     # Pass maze values
     counter = 1
     res = ""
 
-    for cell in maze_generator.maze:
+    for cell in maze.maze:
         res += to_hex(cell.walls)
-        if counter == maze_generator.WIDTH and cell != maze_generator.maze[-1]:
+        if counter == maze.WIDTH and cell != maze.maze[-1]:
             counter = 1
             res += "\n"
             continue
@@ -32,33 +32,31 @@ def transcripter(maze_generator: MazeGenerator):
 
     # Pass entry and exit
     res += "\n\n"
-    entry = get_pos(maze_generator.ENTRY)
-    exit = get_pos(maze_generator.EXIT)
-    res += f"{entry}\n"
-    res += f"{exit}\n"
+    res += f"{maze.ENTRY}\n"
+    res += f"{maze.EXIT}\n"
 
     # Pass solution
     solution = path_finder.path_finder(
-                                    maze_generator.maze,
-                                    maze_generator.ENTRY,
-                                    maze_generator.EXIT,
-                                    maze_generator.WIDTH
-                                )
+        maze.maze,
+        maze.ENTRY,
+        maze.EXIT,
+        maze.WIDTH
+    )
     res += solution
 
     try:
-        with open(maze_generator.OUTPUT_FILE, 'w') as f:
+        with open(maze.OUTPUT_FILE, 'w') as f:
             f.write(res)
     except (
-                UnicodeDecodeError,
-                ValueError,
-                OSError,
-                PermissionError,
-                IsADirectoryError,
-                FileNotFoundError,
+            UnicodeDecodeError,
+            ValueError,
+            OSError,
+            PermissionError,
+            IsADirectoryError,
+            FileNotFoundError,
     ) as msg:
         print(msg)
         sys.exit()
     else:
-        print(f'Content saved to "{maze_generator.OUTPUT_FILE}"')
+        print(f'Content saved to "{maze.OUTPUT_FILE}"')
         sleep(2)

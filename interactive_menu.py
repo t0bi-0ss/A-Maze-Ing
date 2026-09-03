@@ -32,8 +32,8 @@ def _visualizer_route_update(
         maze_generator.EXIT,
         maze_generator.WIDTH
     )
-    visualizer.start = helper_f.convert_pos(maze_generator.ENTRY)
-    visualizer.end = helper_f.convert_pos(maze_generator.EXIT)
+    visualizer.start = maze_generator.ENTRY
+    visualizer.end = maze_generator.EXIT
     route = helper_f.plot_route(visualizer.start, solution)
     visualizer.full_route = route
 
@@ -49,7 +49,7 @@ def interactive_menu(
         visualizer: Renderer used to display the maze and route.
     """
 
-    animation_toggle = 0
+    animation_toggle = False
     original = 1
     original_seed = maze_generator.SEED
 
@@ -72,12 +72,16 @@ def interactive_menu(
         try:
             choice = input(
                 f"Select an option (1-{len(options)}): "
-                ).strip()
+            ).strip()
             print()
         except (EOFError, KeyboardInterrupt):
-            print()
+            print("\nKeyboardInterruptError")
+            sleep(1)
             transcripter.transcripter(maze_generator)
-            sys.exit()
+            print("Exiting program...")
+            sleep(1)
+            helper_f.clear()
+            break
         match choice:
             case "1":  # Toggle animation
                 animation_toggle = not animation_toggle
@@ -149,18 +153,25 @@ def interactive_menu(
             case "8":  # Re-load config
                 maze_generator = helper_f.load_config(sys.argv[1])
                 helper_f.maze_rendering(
-                                    maze=maze_generator,
-                                    visualizer=visualizer,
-                                )
+                    maze=maze_generator,
+                    visualizer=visualizer,
+                )
                 _visualizer_route_update(maze_generator, visualizer)
                 helper_f.maze_rendering(
-                                    maze=maze_generator,
-                                    visualizer=visualizer,
-                                    animated=animation_toggle
-                                )
+                    maze=maze_generator,
+                    visualizer=visualizer,
+                    animated=animation_toggle
+                )
             case "9":  # Exit
                 transcripter.transcripter(maze_generator)
                 print("Exiting program.")
+                sleep(1)
+                helper_f.clear()
                 break
             case _:
                 print("Invalid option. Please try again.")
+                sleep(2)
+                helper_f.maze_rendering(
+                    maze=maze_generator,
+                    visualizer=visualizer,
+                )

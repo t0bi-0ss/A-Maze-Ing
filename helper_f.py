@@ -13,34 +13,7 @@ import helper_f
 from collections import deque
 
 
-def get_pos(dir: tuple[str, str]) -> str:
-    """Return a normalized coordinate string from a maze position tuple.
-
-    Args:
-        dir: A pair of coordinates in the form ``(row, col)``.
-
-    Returns:
-        A normalized string formatted as ``"row,col"``.
-    """
-
-    res = str(dir[0]).replace(' ', '') + ',' + str(dir[1]).replace(' ', '')
-    return res
-
-
-def convert_pos(dir: tuple[str, str]) -> tuple[int, int]:
-    """Convert a coordinate tuple from strings to integers.
-
-    Args:
-        dir: A coordinate pair stored as strings.
-
-    Returns:
-        The same coordinates converted to integer values.
-    """
-
-    return int(dir[0]), int(dir[1])
-
-
-def to_hex(num):
+def to_hex(num: int) -> str:
     """Convert a numeric wall mask to its hexadecimal character representation.
 
     Args:
@@ -104,7 +77,7 @@ def clear() -> None:
     subprocess.run(['clear'])
 
 
-def matrix_converter(maze: list[int], width: int) -> list[list[int]]:
+def matrix_converter(maze: maze_generator.Maze, width: int) -> list[list[int]]:
     """Convert a flat maze representation into a row-wise matrix.
 
     Args:
@@ -146,7 +119,7 @@ def regenerate_maze(
     maze.maze = [
         maze_generator.MazeCell(element_num) for element_num
         in range(0, maze.WIDTH * maze.HEIGHT)
-        ]
+    ]
 
     # Restart rng
     maze.rng = random.Random(maze.SEED)
@@ -254,14 +227,14 @@ def load_config(
         sys.exit()
     else:
         maze = maze_generator.MazeGenerator(
-                width=configuration.width,
-                height=configuration.height,
-                entry=configuration.entry,
-                exit=configuration.exit,
-                perfect=configuration.perfect,
-                seed=configuration.seed,
-                perfect_centered=configuration.perfect_centered,
-                selector=helper_f.define_selector(configuration.algorithm),
-                output_file=configuration.output_file
-            )
+            width=configuration.width,
+            height=configuration.height,
+            entry=configuration.entry,
+            exit=configuration.exit,
+            perfect=configuration.perfect,
+            seed=configuration.seed,
+            perfect_centered=configuration.perfect_centered,
+            selector=helper_f.define_selector(configuration.algorithm),
+            output_file=configuration.output_file
+        )
     return maze
