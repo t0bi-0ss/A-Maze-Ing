@@ -8,7 +8,7 @@ import helper_f
 
 from collections import deque
 
-import path_finder
+from maze_generator import path_finder
 
 import interactive_menu
 
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     deque(maze.generator(), maxlen=0)
 
     # Get maze solution
-    solution = path_finder.path_finder(
+    solution = path_finder(
         maze.maze, maze.ENTRY, maze.EXIT, maze.WIDTH
     )
 

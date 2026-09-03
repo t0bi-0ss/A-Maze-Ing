@@ -2,13 +2,11 @@
 
 import sys
 
-from maze_generator import MazeGenerator
+from maze_generator import MazeGenerator, path_finder
 
 from helper_f import to_hex
 
 from time import sleep
-
-import path_finder
 
 
 def transcripter(maze: MazeGenerator) -> None:
@@ -36,7 +34,7 @@ def transcripter(maze: MazeGenerator) -> None:
     res += f"{maze.EXIT}\n"
 
     # Pass solution
-    solution = path_finder.path_finder(
+    solution = path_finder(
         maze.maze,
         maze.ENTRY,
         maze.EXIT,

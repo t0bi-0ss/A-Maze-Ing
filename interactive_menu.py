@@ -1,10 +1,8 @@
 """Interactive console menus for generating, viewing, and managing mazes."""
 
-import maze_generator
+from maze_generator import path_finder, MazeGenerator
 
 import maze_visualizer
-
-import path_finder
 
 import helper_f
 
@@ -16,7 +14,7 @@ from time import sleep
 
 
 def _visualizer_route_update(
-        maze_generator: maze_generator.MazeGenerator,
+        maze: MazeGenerator,
         visualizer: maze_visualizer.MazeVisualizer
 ) -> None:
     """Update the visualizer route based on the current maze solution.
@@ -26,32 +24,32 @@ def _visualizer_route_update(
         visualizer: Visualizer whose route should be refreshed.
     """
 
-    solution = path_finder.path_finder(
-        maze_generator.maze,
-        maze_generator.ENTRY,
-        maze_generator.EXIT,
-        maze_generator.WIDTH
+    solution = path_finder(
+        maze.maze,
+        maze.ENTRY,
+        maze.EXIT,
+        maze.WIDTH
     )
-    visualizer.start = maze_generator.ENTRY
-    visualizer.end = maze_generator.EXIT
+    visualizer.start = maze.ENTRY
+    visualizer.end = maze.EXIT
     route = helper_f.plot_route(visualizer.start, solution)
     visualizer.full_route = route
 
 
 def interactive_menu(
-        maze_generator: maze_generator.MazeGenerator,
+        maze: MazeGenerator,
         visualizer: maze_visualizer.MazeVisualizer,
 ) -> None:
     """Run the interactive menu loop for maze generation and navigation.
 
     Args:
-        maze_generator: Generator controlling the current maze structure.
+        maze: Generator controlling the current maze structure.
         visualizer: Renderer used to display the maze and route.
     """
 
     animation_toggle = False
     original = 1
-    original_seed = maze_generator.SEED
+    original_seed = maze.SEED
 
     while True:
         options = [
@@ -77,7 +75,7 @@ def interactive_menu(
         except (EOFError, KeyboardInterrupt):
             print("\nKeyboardInterruptError")
             sleep(1)
-            transcripter.transcripter(maze_generator)
+            transcripter.transcripter(maze)
             print("Exiting program...")
             sleep(1)
             helper_f.clear()
@@ -86,33 +84,33 @@ def interactive_menu(
             case "1":  # Toggle animation
                 animation_toggle = not animation_toggle
                 helper_f.maze_rendering(
-                    maze=maze_generator,
+                    maze=maze,
                     visualizer=visualizer
                 )
             case "2":  # Re-generate and visualize
                 helper_f.regenerate_maze(
-                    maze=maze_generator,
+                    maze=maze,
                 )
                 helper_f.maze_rendering(
-                    maze=maze_generator,
+                    maze=maze,
                     visualizer=visualizer,
                     animated=animation_toggle
                 )
             case "3":  # New maze
                 original = 0
                 helper_f.regenerate_maze(
-                    maze=maze_generator,
+                    maze=maze,
                     new_maze=True
                 )
                 helper_f.maze_rendering(
-                    maze=maze_generator,
+                    maze=maze,
                     visualizer=visualizer,
                     animated=animation_toggle
                 )
-                _visualizer_route_update(maze_generator, visualizer)
+                _visualizer_route_update(maze, visualizer)
             case "4":  # Solution path
                 helper_f.maze_rendering(
-                    maze=maze_generator,
+                    maze=maze,
                     visualizer=visualizer,
                     show_path=not visualizer.show_path
                 )
@@ -120,7 +118,7 @@ def interactive_menu(
                 helper_f.clear()
                 visualizer.change_color_palette()
                 helper_f.maze_rendering(
-                    maze=maze_generator,
+                    maze=maze,
                     visualizer=visualizer
                 )
             case "6":  # Original
@@ -128,42 +126,42 @@ def interactive_menu(
                     print("Current maze is already the original one")
                     sleep(2)
                     helper_f.maze_rendering(
-                        maze=maze_generator,
+                        maze=maze,
                         visualizer=visualizer
                     )
                 else:
                     original = 1
-                    maze_generator.SEED = original_seed
+                    maze.SEED = original_seed
                     helper_f.regenerate_maze(
-                        maze=maze_generator
+                        maze=maze
                     )
                     helper_f.maze_rendering(
-                        maze=maze_generator,
+                        maze=maze,
                         visualizer=visualizer,
                         animated=animation_toggle
                     )
-                    _visualizer_route_update(maze_generator, visualizer)
+                    _visualizer_route_update(maze, visualizer)
             case "7":  # Output file
-                transcripter.transcripter(maze_generator)
-                # maze_generator.rng = random.Random(maze_generator.SEED)
+                transcripter.transcripter(maze)
+                # maze.rng = random.Random(maze.SEED)
                 helper_f.maze_rendering(
-                    maze=maze_generator,
+                    maze=maze,
                     visualizer=visualizer,
                 )
             case "8":  # Re-load config
-                maze_generator = helper_f.load_config(sys.argv[1])
+                maze = helper_f.load_config(sys.argv[1])
                 helper_f.maze_rendering(
-                    maze=maze_generator,
+                    maze=maze,
                     visualizer=visualizer,
                 )
-                _visualizer_route_update(maze_generator, visualizer)
+                _visualizer_route_update(maze, visualizer)
                 helper_f.maze_rendering(
-                    maze=maze_generator,
+                    maze=maze,
                     visualizer=visualizer,
                     animated=animation_toggle
                 )
             case "9":  # Exit
-                transcripter.transcripter(maze_generator)
+                transcripter.transcripter(maze)
                 print("Exiting program.")
                 sleep(1)
                 helper_f.clear()
@@ -172,6 +170,6 @@ def interactive_menu(
                 print("Invalid option. Please try again.")
                 sleep(2)
                 helper_f.maze_rendering(
-                    maze=maze_generator,
+                    maze=maze,
                     visualizer=visualizer,
                 )
