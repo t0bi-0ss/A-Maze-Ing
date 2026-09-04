@@ -79,6 +79,7 @@ class MazeConfiguration(BaseModel):
     @field_validator("perfect", "perfect_centered", mode="before")
     @classmethod
     def validate_string_bool(cls, input: str) -> bool:
+        res = False
         if isinstance(input, str):
             valid_strings = {"true", "false", "yes", "no", "1", "0"}
             if input.strip().lower() not in valid_strings:
@@ -86,11 +87,9 @@ class MazeConfiguration(BaseModel):
                     f"String '{input}' is not a valid boolean representation"
                     f"\nValid strings: {valid_strings}"
                 )
-            if input == "yes":
-                return True
-            if input == "no":
-                return False
-        return bool(input)
+            if input in ["true", "yes", "1"]:
+                res = True
+        return res
 
     @staticmethod
     def validate_pos(

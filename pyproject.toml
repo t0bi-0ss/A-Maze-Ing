@@ -1,0 +1,29 @@
+[project]
+name = "a-maze-ing"
+version = "0.1.0"
+description = "maze generation and visualization with a navigation menu"
+authors = [
+    {name = "Tobias Sordo Ostolaza",email = "tsordo-o@c1r2s4.42malaga.com"}
+]
+requires-python = ">=3.10"
+dependencies = [
+    "annotated-types (==0.8.0)",
+    "ast-serialize (==0.8.0)",
+    "flake8 (==7.3.0)",
+    "librt (==0.15.0)",
+    "mccabe (==0.7.0)",
+    "mypy (==2.3.1)",
+    "mypy-extensions (==1.1.0)",
+    "pathspec (==1.1.1)",
+    "pycodestyle (==2.14.0)",
+    "pydantic (==2.13.4)",
+    "pydantic-core (==2.46.4)",
+    "pyflakes (==3.4.0)",
+    "typing-inspection (==0.4.4)",
+    "typing-extensions (==4.16.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

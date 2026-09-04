@@ -40,8 +40,6 @@ def colition_checker(
 
     pattern_cells = [_get_coordinates(cell.INDEX, maze_width) for
                      cell in maze if cell.static]
-    # converted_entry = int(entry[0]), int(entry[1])
-    # converted_exit = int(exit[0]), int(exit[1])
 
     if entry in pattern_cells or exit in pattern_cells:
         print(

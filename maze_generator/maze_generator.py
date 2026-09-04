@@ -41,10 +41,10 @@ class MazeGenerator:
 
     def __init__(
             self,
-            width: int,
-            height: int,
-            entry: tuple[int, int],
-            exit: tuple[int, int],
+            width: int = 3,
+            height: int = 3,
+            entry: tuple[int, int] = (0, 0),
+            exit: tuple[int, int] = (2, 2),
             selector: float = -1,
             perfect: bool = False,
             seed: int | float |
