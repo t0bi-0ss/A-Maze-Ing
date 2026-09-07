@@ -44,6 +44,7 @@ def _select_from_visited(
 
     if len(visited) == 0:
         raise EmptyVisitedList
+    # Growing tree
     if selector == -1:
         selector = rng.random()
     if 0 < selector < 1:

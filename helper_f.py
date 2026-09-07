@@ -9,7 +9,6 @@ import random
 from time import sleep
 import parser
 import sys
-import helper_f
 from collections import deque
 
 
@@ -103,48 +102,6 @@ def matrix_converter(maze: maze_generator.Maze, width: int) -> list[list[int]]:
     return matrix
 
 
-def regenerate_maze(
-        maze: maze_generator.MazeGenerator,
-        new_maze: bool = False
-) -> None:
-    """
-    Regenate a maze, optionally setting a new seed
-    """
-
-    # New maze?
-    if new_maze:
-        maze.SEED = random.random()
-
-    # Restart maze
-    maze.maze = [
-        maze_generator.MazeCell(element_num) for element_num
-        in range(0, maze.WIDTH * maze.HEIGHT)
-    ]
-
-    # Restart rng
-    maze.rng = random.Random(maze.SEED)
-
-    # Set pattern
-    maze_generator.pattern(
-        maze.maze,
-        maze.WIDTH,
-        maze.HEIGHT,
-        maze.PCENTERED,
-        maze.rng
-    )
-
-    # Check for colition
-    maze_generator.colition_checker(
-        maze.maze,
-        maze.ENTRY,
-        maze.EXIT,
-        maze.WIDTH
-    )
-
-    # Restart generator
-    maze.generator = maze.gen_maze
-
-
 def maze_rendering(
         maze: maze_generator.MazeGenerator,
         visualizer: maze_visualizer.MazeVisualizer,
@@ -221,6 +178,7 @@ def load_config(
     """
 
     try:
+        # Get configuration
         configuration = parser.get_config(file_name)
     except SystemExit as msg:
         print(msg)
@@ -234,7 +192,49 @@ def load_config(
             perfect=configuration.perfect,
             seed=configuration.seed,
             perfect_centered=configuration.perfect_centered,
-            selector=helper_f.define_selector(configuration.algorithm),
+            selector=define_selector(configuration.algorithm),
             output_file=configuration.output_file
         )
     return maze
+
+
+def regenerate_maze(
+        maze: maze_generator.MazeGenerator,
+        new_maze: bool = False
+) -> None:
+    """
+    Regenate a maze, optionally setting a new seed
+    """
+
+    # New maze?
+    if new_maze:
+        maze.seed = random.random()
+
+    # Restart maze
+    maze.maze = [
+        maze_generator.MazeCell(element_num) for element_num
+        in range(0, maze.WIDTH * maze.HEIGHT)
+    ]
+
+    # Restart rng
+    maze.rng = random.Random(maze.seed)
+
+    # Set pattern
+    maze_generator.pattern(
+        maze.maze,
+        maze.WIDTH,
+        maze.HEIGHT,
+        maze.PCENTERED,
+        maze.rng
+    )
+
+    # Check for colition
+    maze_generator.colition_checker(
+        maze.maze,
+        maze.ENTRY,
+        maze.EXIT,
+        maze.WIDTH
+    )
+
+    # Restart generator
+    maze.generator = maze.gen_maze

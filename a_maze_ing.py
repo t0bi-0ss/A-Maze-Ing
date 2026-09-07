@@ -46,7 +46,7 @@ if __name__ == "__main__":
     )
 
     # Restart rng
-    maze.rng = random.Random(maze.SEED)
+    maze.rng = random.Random(maze.seed)
 
     # Menu
     interactive_menu.interactive_menu(maze, visualizer)

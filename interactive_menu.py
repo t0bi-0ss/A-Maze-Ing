@@ -12,6 +12,8 @@ import transcripter
 
 from time import sleep
 
+from collections import deque
+
 
 def _visualizer_route_update(
         maze: MazeGenerator,
@@ -49,7 +51,16 @@ def interactive_menu(
 
     animation_toggle = False
     original = 1
-    original_seed = maze.SEED
+    original_seed = maze.seed
+    original_selector = maze.SELECTOR
+
+    match maze.SELECTOR:
+        case 0:
+            current_algorithm = "Backtracking"
+        case 1:
+            current_algorithm = "Prim's"
+        case -1:
+            current_algorithm = "Growing Tree"
 
     while True:
         options = [
@@ -64,6 +75,7 @@ def interactive_menu(
             "Re-load config",
             "Switch Visualizer (Current: " +
             (visualizer.renderizator_selector).upper() + ")",
+            f"Select algorithm (Current: {current_algorithm})",
             "Exit"
         ]
         print("\n=== A-Maze-ing Interactive Menu ===")
@@ -77,7 +89,6 @@ def interactive_menu(
             print()
         except (EOFError, KeyboardInterrupt):
             print("\nKeyboardInterruptError")
-            sleep(1)
             transcripter.transcripter(maze)
             print("Exiting program...")
             sleep(1)
@@ -136,7 +147,8 @@ def interactive_menu(
                     )
                 else:
                     original = 1
-                    maze.SEED = original_seed
+                    maze.seed = original_seed
+                    maze.SELECTOR = original_selector
                     helper_f.regenerate_maze(
                         maze=maze
                     )
@@ -148,17 +160,18 @@ def interactive_menu(
                     _visualizer_route_update(maze, visualizer)
             case "7":  # Output file
                 transcripter.transcripter(maze)
-                # maze.rng = random.Random(maze.SEED)
+                # maze.rng = random.Random(maze.seed)
                 helper_f.maze_rendering(
                     maze=maze,
                     visualizer=visualizer,
                 )
             case "8":  # Re-load config
                 maze = helper_f.load_config(sys.argv[1])
-                helper_f.maze_rendering(
-                    maze=maze,
-                    visualizer=visualizer,
-                )
+                deque(maze.generator(), maxlen=0)
+                # helper_f.maze_rendering(
+                #     maze=maze,
+                #     visualizer=visualizer,
+                # )
                 _visualizer_route_update(maze, visualizer)
                 helper_f.maze_rendering(
                     maze=maze,
@@ -173,7 +186,56 @@ def interactive_menu(
                     maze=maze,
                     visualizer=visualizer
                 )
-            case "10":  # Exit
+            case "10":  # Algorithm
+                try:
+                    while True:
+                        helper_f.maze_rendering(
+                            maze=maze,
+                            visualizer=visualizer
+                        )
+                        print(
+                            "1.Prim's\n2.Backtracking\n3.Growing Tree"
+                        )
+                        try:
+                            algo_choice = input("Choice: ")
+                        except KeyboardInterrupt:
+                            raise KeyboardInterrupt
+                        else:
+                            match algo_choice:
+                                case "1":
+                                    maze.SELECTOR = 1
+                                case "2":
+                                    maze.SELECTOR = 0
+                                case "3":
+                                    maze.SELECTOR = -1
+                                case _:
+                                    print(
+                                        "Error: unrecognized selection. "
+                                        "Try again"
+                                    )
+                                    sleep(1)
+                                    continue
+                            match maze.SELECTOR:
+                                case 0:
+                                    current_algorithm = "Backtracking"
+                                case 1:
+                                    current_algorithm = "Prim's"
+                                case -1:
+                                    current_algorithm = "Growing Tree"
+                            break
+                except KeyboardInterrupt:
+                    print("\nKeyboardInterruptError")
+                    transcripter.transcripter(maze)
+                    print("Exiting program...")
+                    sleep(1)
+                    helper_f.clear()
+                    break
+                else:
+                    helper_f.maze_rendering(
+                        maze=maze,
+                        visualizer=visualizer
+                    )
+            case "11":  # Exit
                 transcripter.transcripter(maze)
                 print("Exiting program.")
                 sleep(1)

@@ -26,8 +26,10 @@ def _locate_center(
     possible_indexes = []
     chosen_center = -1
 
+    # If both are not even
     if maze_width % 2 != 0 and maze_height % 2 != 0:
         chosen_center = (maze_height // 2) * maze_width + (maze_width // 2)
+    # If only width is even
     elif maze_width % 2 == 0 and maze_height % 2 != 0:
         left_center_index = (maze_height // 2) * \
             maze_width + (maze_width // 2 - 1)
@@ -36,6 +38,7 @@ def _locate_center(
         possible_indexes.append(left_center_index)
         possible_indexes.append(right_center_index)
         chosen_center = rng.choice(possible_indexes)
+    # If only height is even
     elif maze_width % 2 != 0 and maze_height % 2 == 0:
         top_center_index = ((maze_height // 2) - 1) \
             * maze_width + (maze_width // 2)
@@ -44,6 +47,7 @@ def _locate_center(
         possible_indexes.append(top_center_index)
         possible_indexes.append(bottom_center_index)
         chosen_center = rng.choice(possible_indexes)
+    # If both are even
     elif maze_width % 2 == 0 and maze_height % 2 == 0:
         rows = [maze_height // 2 - 1, maze_height // 2]
         cols = [maze_width // 2 - 1, maze_width // 2]

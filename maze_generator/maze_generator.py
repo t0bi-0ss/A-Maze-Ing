@@ -28,8 +28,8 @@ def _starting_cell(maze: Maze, rng: random.Random) -> MazeCell:
 
     cell = rng.choice(maze)
 
-    if cell.static:
-        cell = _starting_cell(maze, rng)
+    while cell.static:
+        cell = rng.choice(maze)
     cell.is_now_visited()
     return cell
 
@@ -73,7 +73,7 @@ class MazeGenerator:
         self.EXIT = exit
         self.PERFECT = perfect
         self.SELECTOR = selector
-        self.SEED = seed
+        self.seed = seed
         self.rng = random.Random(seed)
         self.PCENTERED = perfect_centered
         self.maze = [MazeCell(element_num) for element_num
@@ -91,7 +91,7 @@ class MazeGenerator:
         """
 
         visited_cells = [_starting_cell(self.maze, self.rng)]
-        while len(visited_cells):
+        while visited_cells:
             yield self.maze
             growing_tree(
                 visited_cells,

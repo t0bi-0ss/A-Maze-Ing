@@ -64,8 +64,6 @@ class MazeConfiguration(BaseModel):
                     int(input_list[1])
                 except ValueError as msg:
                     raise ValueError(msg)
-                else:
-                    return int(input_list[0]), int(input_list[1])
         return int(input_list[0]), int(input_list[1])
 
     @field_validator("algorithm", mode="before")
