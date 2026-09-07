@@ -38,7 +38,7 @@ def _visualizer_route_update(
 
 def interactive_menu(
         maze: MazeGenerator,
-        visualizer: maze_visualizer.MazeVisualizer,
+        visualizer: maze_visualizer.MazeVisualizer
 ) -> None:
     """Run the interactive menu loop for maze generation and navigation.
 
@@ -53,7 +53,9 @@ def interactive_menu(
 
     while True:
         options = [
-            f"Toggle Animation. {'ON' if animation_toggle else 'OFF'}",
+            f"Toggle Animation. Status: {
+                'ON' if animation_toggle else 'OFF'
+                }",
             "Re-generate maze",
             "Generate new maze",
             "Show/Hide solution path",
@@ -61,6 +63,9 @@ def interactive_menu(
             "Recover original maze",
             "Generate output file",
             "Re-load config",
+            f"Switch Visualizer (Current: {
+                (visualizer.renderizator_selector).upper()
+                })",
             "Exit"
         ]
         print("\n=== A-Maze-ing Interactive Menu ===")
@@ -96,6 +101,7 @@ def interactive_menu(
                     visualizer=visualizer,
                     animated=animation_toggle
                 )
+                _visualizer_route_update(maze, visualizer)
             case "3":  # New maze
                 original = 0
                 helper_f.regenerate_maze(
@@ -119,7 +125,8 @@ def interactive_menu(
                 visualizer.change_color_palette()
                 helper_f.maze_rendering(
                     maze=maze,
-                    visualizer=visualizer
+                    visualizer=visualizer,
+                    show_path=visualizer.show_path
                 )
             case "6":  # Original
                 if original:
@@ -160,7 +167,15 @@ def interactive_menu(
                     visualizer=visualizer,
                     animated=animation_toggle
                 )
-            case "9":  # Exit
+            case "9":  # Render selector
+                visualizer.change_renderizator()
+                print("Switched visualizer style!")
+                sleep(1)
+                helper_f.maze_rendering(
+                    maze=maze,
+                    visualizer=visualizer
+                )
+            case "10":  # Exit
                 transcripter.transcripter(maze)
                 print("Exiting program.")
                 sleep(1)

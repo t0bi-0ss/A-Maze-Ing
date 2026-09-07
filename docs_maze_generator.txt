@@ -1,1 +1,0 @@
-pip install <created '.whl' file>  #Directly install a previously written file.

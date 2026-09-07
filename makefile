@@ -25,9 +25,9 @@ clean:
 	rm -rf .mypy_cache
 
 lint:
-	flake8 .
-	mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+	flake8 --exclude=__pycache__,.venv,maze_analyzer.py .
+	mypy . --exclude '(__pycache__|\.venv|maze_analyzer\.py)' --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 lint-strict:
-	flake8 --ignore=0,W503,W504 .
-	mypy . --strict
+	flake8 --ignore=0,W503,W504 --exclude=__pycache__,.venv,maze_analyzer.py .
+	mypy . --exclude '(__pycache__|\.venv|maze_analyzer\.py)' --strict

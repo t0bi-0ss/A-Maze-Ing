@@ -7,6 +7,8 @@ from pydantic import ValidationError, BaseModel, \
 
 from typing_extensions import Self
 
+import random
+
 
 class InvalidTerminalNodesError(Exception):
     """Raised when a maze terminal node is invalid."""
@@ -25,7 +27,7 @@ class MazeConfiguration(BaseModel):
         pattern=r"^[a-zA-Z0-9._-ñ]+$"
     )
     perfect: bool
-    seed: str | int | float | None = None
+    seed: str | int | float | None = random.random()
     algorithm: str = "gt"
     perfect_centered: bool = True
 

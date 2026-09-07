@@ -2,6 +2,7 @@
 
 import itertools
 import maze_generator
+import helper_f
 
 # Bitmask
 WALL_NORTH = 1 << 0  # 0001
@@ -16,6 +17,34 @@ COLOR_PALETTES: tuple[tuple[str, str, str], ...] = (
     ("\033[37m", "\033[38;5;250m", "\033[1;32m"),
     ("\033[35m", "\033[38;5;93m", "\033[1;33m"),
     ("\033[33m", "\033[38;5;130m", "\033[1;36m"),
+)
+
+# Box-drawing characters for grid intersections (up, right, down, left)
+_BOX_JUNCTIONS: dict[tuple[bool, bool, bool, bool], str] = {
+    (False, False, False, False): " ",
+    (True,  False, False, False): "│",
+    (False, False, True,  False): "│",
+    (True,  False, True,  False): "│",
+    (False, False, False, True):  "─",
+    (False, True,  False, False): "─",
+    (False, True,  False, True):  "─",
+    (False, True,  True,  False): "┌",
+    (False, False, True,  True):  "┐",
+    (True,  True,  False, False): "└",
+    (True,  False, False, True):  "┘",
+    (True,  True,  True,  False): "├",
+    (True,  False, True,  True):  "┤",
+    (False, True,  True,  True):  "┬",
+    (True,  True,  False, True):  "┴",
+    (True,  True,  True,  True):  "┼",
+}
+
+# Renderizator selector
+RENDERIZATORS_ITERATOR = itertools.cycle(
+    [
+        "thick",
+        "slender"
+    ]
 )
 
 
@@ -35,19 +64,19 @@ class MazeVisualizer:
         self.start = start
         self.end = end
         self.show_path = False
-
+        self.renderizator_selector = next(RENDERIZATORS_ITERATOR)
         self._palette_iterator = itertools.cycle(COLOR_PALETTES)
         (self.current_wall, self.current_42,
          self.current_route) = next(self._palette_iterator)
 
-    def render_ascii(self, maze: maze_generator.Maze, width: int) -> None:
+    def render_ascii_thick(
+            self, maze: maze_generator.Maze, width: int
+    ) -> None:
         """Print a maze matrix as a colored ASCII representation.
 
         Args:
             maze: 2D list of wall-bit values representing the maze.
         """
-
-        import helper_f
 
         if not maze:
             print("ERROR: The maze is empty")
@@ -266,6 +295,162 @@ class MazeVisualizer:
             print(self.current_wall + (BLOCK * (columns * 2 + 1))
                   + RESET_COLOR)
 
+    def render_ascii_slender(
+            self, maze: maze_generator.Maze, width: int
+    ) -> None:
+        """Render the maze with thin walls and open corridors
+        to the terminal.
+
+        Args:
+            maze: Flat list or generator data of maze cells.
+            width: Number of cells per row.
+        """
+        import helper_f
+
+        if not maze:
+            print("ERROR: The maze is empty")
+            return
+
+        matrix = helper_f.matrix_converter(maze, width)
+        if not matrix:
+            print("Error: The maze matrix is invalid.")
+            return
+
+        rows = len(matrix)
+        cols = width
+        reset = "\033[0m"
+
+        # Theme colors
+        wall_col = self.current_wall
+        route_col = self.current_route
+        block_42_col = self.current_42
+
+        # Start and Exit highlight colors (matching original: vibrant
+        # orange start, neon lime end)
+        start_col = "\033[38;5;208m"
+        end_col = "\033[38;5;118m"
+
+        # Path connections set for O(1) membership checks
+        set_ruta = set(self.full_route) if self.show_path else set()
+
+        # Build pair set of consecutive route steps: {(cell_a, cell_b), ...}
+        route_edges: set[tuple[tuple[int, int], tuple[int, int]]] = set()
+        if self.show_path and len(self.full_route) > 1:
+            for i in range(len(self.full_route) - 1):
+                c1 = self.full_route[i]
+                c2 = self.full_route[i + 1]
+                route_edges.add((c1, c2))
+                route_edges.add((c2, c1))
+
+        def is_horiz_wall(r: int, c: int) -> bool:
+            """Check if horizontal wall segment exists between
+            row r-1 and r at col c."""
+            if r == 0 or r == rows:
+                return True
+            top_cell = matrix[r - 1][c]
+            bot_cell = matrix[r][c]
+            return bool((top_cell & WALL_SOUTH) or (bot_cell & WALL_NORTH))
+
+        def is_vert_wall(r: int, c: int) -> bool:
+            """Check if vertical wall segment exists between col
+            c-1 and c at row r."""
+            if c == 0 or c == cols:
+                return True
+            left_cell = matrix[r][c - 1]
+            right_cell = matrix[r][c]
+            return bool((left_cell & WALL_EAST) or (right_cell & WALL_WEST))
+
+        # Render top border down to bottom border
+        for r in range(rows + 1):
+            # 1. HORIZONTAL LINE (Intersections & Horizontal Walls / Doorways)
+            h_line_parts: list[str] = []
+            for c in range(cols + 1):
+                # Intersection corner at (r, c)
+                up = (r > 0) and is_vert_wall(r - 1, c)
+                down = (r < rows) and is_vert_wall(r, c)
+                left = (c > 0) and is_horiz_wall(r, c - 1)
+                right = (c < cols) and is_horiz_wall(r, c)
+
+                junction_char = _BOX_JUNCTIONS.get((
+                    up, right, down, left), "┼")
+                h_line_parts.append(wall_col + junction_char + reset)
+
+                # Horizontal wall or doorway between vertex
+                # (r, c) and (r, c + 1)
+                if c < cols:
+                    if is_horiz_wall(r, c):
+                        h_line_parts.append(wall_col + "───" + reset)
+                    else:
+                        # Open doorway between (r-1, c) and (r, c)
+                        if ((r - 1, c), (r, c)) in route_edges:
+                            # Solution path passing vertically through doorway
+                            h_line_parts.append(route_col + " │ " + reset)
+                        else:
+                            h_line_parts.append("   ")
+
+            print("".join(h_line_parts))
+
+            # 2. CELL INTERIOR LINE (Vertical walls & Cell interiors)
+            if r < rows:
+                c_line_parts: list[str] = []
+                for c in range(cols + 1):
+                    # Vertical wall or doorway on the left of cell (r, c)
+                    if is_vert_wall(r, c):
+                        c_line_parts.append(wall_col + "│" + reset)
+                    else:
+                        # Open doorway between (r, c-1) and (r, c)
+                        if ((r, c - 1), (r, c)) in route_edges:
+                            # Solution path passing
+                            # horizontally through doorway
+                            c_line_parts.append(route_col + "─" + reset)
+                        else:
+                            c_line_parts.append(" ")
+
+                    # Inside cell (r, c) (3 characters wide)
+                    if c < cols:
+                        val = matrix[r][c]
+                        is_locked = (val & LOCKED_CELL) == LOCKED_CELL
+
+                        if (r, c) == self.start:
+                            c_line_parts.append(start_col + "███" + reset)
+                        elif (r, c) == self.end:
+                            c_line_parts.append(end_col + "███" + reset)
+                        elif is_locked:
+                            # 42 pattern or locked obstacle block
+                            c_line_parts.append(block_42_col + "███" + reset)
+                        elif (r, c) in set_ruta:
+                            # Detect which directions connect to this cell
+                            has_n = ((r, c), (r - 1, c)) in route_edges
+                            has_s = ((r, c), (r + 1, c)) in route_edges
+                            has_e = ((r, c), (r, c + 1)) in route_edges
+                            has_w = ((r, c), (r, c - 1)) in route_edges
+
+                            if has_w and has_e:
+                                glyph = "───"
+                            elif has_n and has_s:
+                                glyph = " │ "
+                            elif has_n and has_e:
+                                glyph = " └─"
+                            elif has_n and has_w:
+                                glyph = "─┘ "
+                            elif has_s and has_e:
+                                glyph = " ┌─"
+                            elif has_s and has_w:
+                                glyph = "─┐ "
+                            elif has_e:
+                                glyph = " ──"
+                            elif has_w:
+                                glyph = "── "
+                            elif has_n or has_s:
+                                glyph = " │ "
+                            else:
+                                glyph = " · "
+                            c_line_parts.append(route_col + glyph + reset)
+                        else:
+                            c_line_parts.append("   ")
+
+                print("".join(c_line_parts))
+
     def change_color_palette(self) -> None:
         """Advance to the next predefined color palette.
 
@@ -274,3 +459,28 @@ class MazeVisualizer:
         """
         (self.current_wall, self.current_42,
          self.current_route) = next(self._palette_iterator)
+
+    def change_renderizator(self) -> None:
+        """
+        Advance to the next predefined selector
+        """
+
+        self.renderizator_selector = next(RENDERIZATORS_ITERATOR)
+
+    def renderize(
+            self,
+            maze: maze_generator.Maze,
+            width: int
+    ) -> None:
+        """
+        Renders maze according to current selected renderizator
+        """
+        if self.renderizator_selector == "thick":
+            self.render_ascii_thick(maze, width)
+        elif self.renderizator_selector == "slender":
+            self.render_ascii_slender(maze, width)
+        else:
+            raise SystemExit(
+                "An error occured with current selected"
+                "renderizator: Unrecognized renderizator"
+            )

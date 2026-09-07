@@ -49,7 +49,7 @@ class MazeGenerator:
             perfect: bool = False,
             seed: int | float |
             str | bytes |
-            bytearray | None = None,
+            bytearray | None = random.random(),
             perfect_centered: bool = True,
             output_file: str = "maze.txt"
     ) -> None:

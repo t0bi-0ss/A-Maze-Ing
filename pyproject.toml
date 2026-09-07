@@ -3,7 +3,7 @@ name = "a-maze-ing"
 version = "0.1.0"
 description = "maze generation and visualization with a navigation menu"
 authors = [
-    {name = "Tobias Sordo Ostolaza",email = "tsordo-o@c1r2s4.42malaga.com"}
+    {name = "Tobias Sordo Ostolaza",email = "tsordo-o@42malaga.com"}
 ]
 requires-python = ">=3.10"
 dependencies = [

@@ -164,12 +164,12 @@ def maze_rendering(
         visualizer.show_path = True
     else:
         visualizer.show_path = False
-
+    clear()
     if animated:
         try:
             for frame in maze.generator():
-                clear()
-                visualizer.render_ascii(
+                print("\033[H", end="")
+                visualizer.renderize(
                     maze=maze.maze,
                     width=maze.WIDTH
                 )
@@ -180,8 +180,8 @@ def maze_rendering(
     else:
 
         deque(maze.generator(), maxlen=0)
-        clear()
-        visualizer.render_ascii(
+        print("\033[H", end="")
+        visualizer.renderize(
             maze=maze.maze,
             width=maze.WIDTH
         )
