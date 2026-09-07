@@ -2,7 +2,6 @@
 
 import itertools
 import maze_generator
-import helper_f
 
 # Bitmask
 WALL_NORTH = 1 << 0  # 0001
@@ -36,7 +35,7 @@ _BOX_JUNCTIONS: dict[tuple[bool, bool, bool, bool], str] = {
     (True, False, True, True): "┤",
     (False, True, True, True): "┬",
     (True, True, False, True): "┴",
-    (True, True, True,  True): "┼"
+    (True, True, True, True): "┼"
 }
 
 # Renderizator selector
@@ -78,6 +77,8 @@ class MazeVisualizer:
         Args:
             maze: 2D list of wall-bit values representing the maze.
         """
+
+        import helper_f
 
         if not maze:
             print("ERROR: The maze is empty")

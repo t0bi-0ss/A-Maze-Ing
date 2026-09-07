@@ -53,9 +53,8 @@ def interactive_menu(
 
     while True:
         options = [
-            f"Toggle Animation. Status: {
-                'ON' if animation_toggle else 'OFF'
-                }",
+            "Toggle Animation. (Status: " +
+            ('ON)' if animation_toggle else 'OFF)'),
             "Re-generate maze",
             "Generate new maze",
             "Show/Hide solution path",
@@ -63,9 +62,8 @@ def interactive_menu(
             "Recover original maze",
             "Generate output file",
             "Re-load config",
-            f"Switch Visualizer (Current: {
-                (visualizer.renderizator_selector).upper()
-                })",
+            "Switch Visualizer (Current: " +
+            (visualizer.renderizator_selector).upper() + ")",
             "Exit"
         ]
         print("\n=== A-Maze-ing Interactive Menu ===")
