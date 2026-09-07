@@ -17,7 +17,7 @@ import random
 if __name__ == "__main__":
 
     if len(sys.argv) != 2:
-        print("ERROR: 2 files needed")
+        print("ERROR: Usage: python3 a_maze_ing.py <configfile>")
         sys.exit()
 
     # Config file name

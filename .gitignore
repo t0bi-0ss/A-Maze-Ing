@@ -1,0 +1,7 @@
+*__pycache__
+maze.txt
+.venv
+maze_analyzer.py
+setup.cfg
+.mypy_cache
+poetry.lock
