@@ -1,4 +1,4 @@
-MAIN_SCRIPT = main.py
+MAIN_SCRIPT = a_maze_ing.py
 WHL_FILE = maze_generator-1.0-py3-none-any.whl
 CONFIG_FILE = config.txt
 
@@ -10,19 +10,20 @@ install:
 
 run:
 	@test -n "$(CONFIG_FILE)" || (echo "Error: Specify a file with 'CONFIG_FILE=path/to/file'" && exit 1)
-	python $(MAIN_SCRIPT) $(CONFIG_FILE)
+	python3 $(MAIN_SCRIPT) $(CONFIG_FILE)
 
 run-poetry:
 	@test -n "$(CONFIG_FILE)" || (echo "Error: Specify a file with 'CONFIG_FILE=path/to/file'" && exit 1)
 	poetry install
-	poetry run python $(MAIN_SCRIPT) $(CONFIG_FILE)
+	poetry run python3 $(MAIN_SCRIPT) $(CONFIG_FILE)
 
 debug:
-	python -m pdb $(MAIN_SCRIPT) $(CONFIG_FILE)
+	python3 -m pdb $(MAIN_SCRIPT) $(CONFIG_FILE)
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	rm -rf .mypy_cache
+	rm -rf poetry.lock
 
 lint:
 	flake8 --exclude=__pycache__,.venv,maze_analyzer.py .

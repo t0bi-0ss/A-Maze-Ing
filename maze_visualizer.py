@@ -22,21 +22,21 @@ COLOR_PALETTES: tuple[tuple[str, str, str], ...] = (
 # Box-drawing characters for grid intersections (up, right, down, left)
 _BOX_JUNCTIONS: dict[tuple[bool, bool, bool, bool], str] = {
     (False, False, False, False): " ",
-    (True,  False, False, False): "│",
-    (False, False, True,  False): "│",
-    (True,  False, True,  False): "│",
-    (False, False, False, True):  "─",
-    (False, True,  False, False): "─",
-    (False, True,  False, True):  "─",
-    (False, True,  True,  False): "┌",
-    (False, False, True,  True):  "┐",
-    (True,  True,  False, False): "└",
-    (True,  False, False, True):  "┘",
-    (True,  True,  True,  False): "├",
-    (True,  False, True,  True):  "┤",
-    (False, True,  True,  True):  "┬",
-    (True,  True,  False, True):  "┴",
-    (True,  True,  True,  True):  "┼",
+    (True, False, False, False): "│",
+    (False, False, True, False): "│",
+    (True, False, True, False): "│",
+    (False, False, False, True): "─",
+    (False, True, False, False): "─",
+    (False, True, False, True): "─",
+    (False, True, True, False): "┌",
+    (False, False, True, True): "┐",
+    (True, True, False, False): "└",
+    (True, False, False, True): "┘",
+    (True, True, True, False): "├",
+    (True, False, True, True): "┤",
+    (False, True, True, True): "┬",
+    (True, True, False, True): "┴",
+    (True, True, True,  True): "┼"
 }
 
 # Renderizator selector
@@ -53,7 +53,8 @@ class MazeVisualizer:
 
     def __init__(self, route: list[tuple[int, int]],
                  start: tuple[int, int], end: tuple[int, int]) -> None:
-        """Initialize the visualizer state and color palette.
+        """
+        Initialize the visualizer state and color palette.
 
         Args:
             route: Full path coordinates currently associated with the maze.
@@ -238,7 +239,6 @@ class MazeVisualizer:
             # --- Vertical Connections and Intersections ---
             if f < len(matrix) - 1:
                 connector_line = self.current_wall + BLOCK + RESET_COLOR
-
                 for c in range(columns):
                     v = matrix[f][c]
                     v_bottom = matrix[f + 1][c]
