@@ -194,7 +194,8 @@ def interactive_menu(
                             visualizer=visualizer
                         )
                         print(
-                            "1.Prim's\n2.Backtracking\n3.Growing Tree"
+                            "1.Prim's like\n2.Backtracking like"
+                            "\n3.Growing Tree"
                         )
                         try:
                             algo_choice = input("Choice: ")

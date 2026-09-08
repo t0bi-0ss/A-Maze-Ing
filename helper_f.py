@@ -148,7 +148,7 @@ def define_selector(algorithm: str) -> int:
     """Map a maze-generation algorithm name to its selection integer.
 
     Args:
-        algorithm: Algorithm identifier such as ``gt``, ``prism``, or
+        algorithm: Algorithm identifier such as ``gt``, ``prims``, or
             ``backtracking``.
 
     Returns:
@@ -158,7 +158,7 @@ def define_selector(algorithm: str) -> int:
     match algorithm:
         case "gt":
             res = -1
-        case "prism":
+        case "prims":
             res = 1
         case "backtracking":
             res = 0

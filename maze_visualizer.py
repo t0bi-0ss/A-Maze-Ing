@@ -119,6 +119,7 @@ class MazeVisualizer:
 
         # Body path
         for f in range(len(matrix)):
+            # West side wall
             body_line_top = self.current_wall + BLOCK + RESET_COLOR
             body_line_bottom = self.current_wall + BLOCK + RESET_COLOR
 
@@ -135,54 +136,54 @@ class MazeVisualizer:
                     body_line_bottom += END_COLOR + END_BLOCK + RESET_COLOR
                 elif (f, c) in set_ruta:
                     # Dynamic mapping of route connections for the current cell
-                    has_north = False
-                    has_south = False
-                    has_east = False
-                    has_west = False
+                    goes_north = False
+                    goes_south = False
+                    goes_east = False
+                    goes_west = False
 
                     for i in range(len(self.full_route) - 1):
                         curr = self.full_route[i]
                         nxt = self.full_route[i + 1]
                         if curr == (f, c):
                             if nxt == (f - 1, c):
-                                has_north = True
+                                goes_north = True
                             elif nxt == (f + 1, c):
-                                has_south = True
+                                goes_south = True
                             elif nxt == (f, c + 1):
-                                has_east = True
+                                goes_east = True
                             elif nxt == (f, c - 1):
-                                has_west = True
+                                goes_west = True
                         elif nxt == (f, c):
                             if curr == (f - 1, c):
-                                has_north = True
+                                goes_north = True
                             elif curr == (f + 1, c):
-                                has_south = True
+                                goes_south = True
                             elif curr == (f, c + 1):
-                                has_east = True
+                                goes_east = True
                             elif curr == (f, c - 1):
-                                has_west = True
+                                goes_west = True
 
                     # 4 top chars
                     t_chars = [" ", " ", " ", " "]
-                    t_chars[0] = "▄" if has_west else " "
-                    t_chars[3] = "▄" if has_east else " "
+                    t_chars[0] = "▄" if goes_west else " "
+                    t_chars[3] = "▄" if goes_east else " "
                     # The central cells (indices 1 and 2) adapt
                     # to vertical or horizontal flow.
-                    has_e_w_s = has_east or has_west or has_south
+                    goes_e_w_s = goes_east or goes_west or goes_south
                     t_chars[1] = (
-                        "█" if has_north else ("▄" if has_e_w_s else " "))
+                        "█" if goes_north else ("▄" if goes_e_w_s else " "))
                     t_chars[2] = (
-                        "█" if has_north else ("▄" if has_e_w_s else " "))
+                        "█" if goes_north else ("▄" if goes_e_w_s else " "))
 
                     # 4 bottom chars
                     b_chars = [" ", " ", " ", " "]
-                    b_chars[0] = "▀" if has_west else " "
-                    b_chars[3] = "▀" if has_east else " "
-                    has_e_w_n = has_east or has_west or has_north
+                    b_chars[0] = "▀" if goes_west else " "
+                    b_chars[3] = "▀" if goes_east else " "
+                    goes_e_w_n = goes_east or goes_west or goes_north
                     b_chars[1] = (
-                        "█" if has_south else ("▀" if has_e_w_n else " "))
+                        "█" if goes_south else ("▀" if goes_e_w_n else " "))
                     b_chars[2] = (
-                        "█" if has_south else ("▀" if has_e_w_n else " "))
+                        "█" if goes_south else ("▀" if goes_e_w_n else " "))
 
                     body_line_top += (self.current_route +
                                       "".join(t_chars) + RESET_COLOR)
@@ -222,7 +223,7 @@ class MazeVisualizer:
                                           BLOCK + RESET_COLOR)
                         body_line_bottom += (self.current_wall +
                                              BLOCK + RESET_COLOR)
-                    elif (v & WALL_EAST) or (v_next & WALL_WEST):
+                    elif (v & WALL_EAST) and (v_next & WALL_WEST):
                         body_line_top += (self.current_wall +
                                           BLOCK + RESET_COLOR)
                         body_line_bottom += (self.current_wall +
@@ -273,18 +274,10 @@ class MazeVisualizer:
 
                     # Diagonal intersection
                     if c < columns - 1:
-                        v_right = matrix[f][c + 1]
-                        v_bot_right = matrix[f + 1][c + 1]
-
-                        c2_42 = (v_right & LOCKED_CELL) == LOCKED_CELL
-                        c4_42 = (v_bot_right & LOCKED_CELL) == LOCKED_CELL
-
-                        if c1_42 or c2_42 or c3_42 or c4_42:
-                            connector_line += (self.current_wall +
-                                               BLOCK + RESET_COLOR)
-                        else:
-                            connector_line += (self.current_wall +
-                                               BLOCK + RESET_COLOR)
+                        connector_line += (
+                            self.current_wall +
+                            BLOCK + RESET_COLOR
+                        )
 
                 connector_line += self.current_wall + BLOCK + RESET_COLOR
 
@@ -421,28 +414,28 @@ class MazeVisualizer:
                             c_line_parts.append(block_42_col + "███" + reset)
                         elif (r, c) in set_ruta:
                             # Detect which directions connect to this cell
-                            has_n = ((r, c), (r - 1, c)) in route_edges
-                            has_s = ((r, c), (r + 1, c)) in route_edges
-                            has_e = ((r, c), (r, c + 1)) in route_edges
-                            has_w = ((r, c), (r, c - 1)) in route_edges
+                            goes_n = ((r, c), (r - 1, c)) in route_edges
+                            goes_s = ((r, c), (r + 1, c)) in route_edges
+                            goes_e = ((r, c), (r, c + 1)) in route_edges
+                            goes_w = ((r, c), (r, c - 1)) in route_edges
 
-                            if has_w and has_e:
+                            if goes_w and goes_e:
                                 glyph = "───"
-                            elif has_n and has_s:
+                            elif goes_n and goes_s:
                                 glyph = " │ "
-                            elif has_n and has_e:
+                            elif goes_n and goes_e:
                                 glyph = " └─"
-                            elif has_n and has_w:
+                            elif goes_n and goes_w:
                                 glyph = "─┘ "
-                            elif has_s and has_e:
+                            elif goes_s and goes_e:
                                 glyph = " ┌─"
-                            elif has_s and has_w:
+                            elif goes_s and goes_w:
                                 glyph = "─┐ "
-                            elif has_e:
+                            elif goes_e:
                                 glyph = " ──"
-                            elif has_w:
+                            elif goes_w:
                                 glyph = "── "
-                            elif has_n or has_s:
+                            elif goes_n or goes_s:
                                 glyph = " │ "
                             else:
                                 glyph = " · "

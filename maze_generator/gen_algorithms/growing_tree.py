@@ -49,7 +49,7 @@ def _select_from_visited(
         selector = rng.random()
     if 0 < selector < 1:
         selector = stochastic_round(selector, rng)
-    # Prism
+    # prims
     if selector == 1:
         selected_cell = rng.choice(visited)
     # Backtracking
@@ -106,7 +106,7 @@ def _return_valid_dir_and_neighbor(
     directions = [dir for dir in Directions]
     current_cell_index = current_cell.INDEX
 
-    while len(directions):
+    while directions:
         dir = rng.choice(directions)
         try:
             neighbors_index = validate_direction(
@@ -118,7 +118,7 @@ def _return_valid_dir_and_neighbor(
             directions.remove(dir)
         else:
             break
-    if not neighbor and not len(directions):
+    if not neighbor and not directions:
         raise NoValidNeighbors
 
     return dir, neighbor

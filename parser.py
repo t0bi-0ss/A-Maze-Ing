@@ -1,6 +1,7 @@
 """Configuration parsing and validation utilities for the maze project."""
 
-from configparser import ConfigParser, ParsingError, InterpolationSyntaxError
+from configparser import ConfigParser, ParsingError, \
+    InterpolationSyntaxError, DuplicateOptionError, DuplicateSectionError
 
 from pydantic import ValidationError, BaseModel, \
     Field, model_validator, field_validator
@@ -69,7 +70,7 @@ class MazeConfiguration(BaseModel):
     @field_validator("algorithm", mode="before")
     @classmethod
     def validate_algorithm(cls, input: str) -> str:
-        allowed_strings = ["prism", "backtracking", "gt"]
+        allowed_strings = ["prims", "backtracking", "gt"]
         try:
             assert input in allowed_strings
         except AssertionError:
@@ -190,6 +191,8 @@ def get_config(config_file: str) -> MazeConfiguration:
         print(msg)
         raise SystemExit
     except InterpolationSyntaxError as msg:
+        raise SystemExit(msg)
+    except (DuplicateOptionError, DuplicateSectionError) as msg:
         raise SystemExit(msg)
 
     # Get dict of configparser options

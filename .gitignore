@@ -5,3 +5,7 @@ maze_analyzer.py
 setup.cfg
 .mypy_cache
 poetry.lock
+dic
+dist
+.egg-info
+build

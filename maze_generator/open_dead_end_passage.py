@@ -111,21 +111,25 @@ def _keep_middle_direction(
 
     valid_directions_set = set(valid_directions_dict.keys())
 
+    # East must be deleted
     if not {Directions.NORTH, Directions.EAST, Directions.SOUTH}.difference(
         valid_directions_set
     ):
         del valid_directions_dict[Directions.NORTH]
         del valid_directions_dict[Directions.SOUTH]
+    # South must be deleted
     elif not {Directions.EAST, Directions.SOUTH, Directions.WEST}.difference(
             valid_directions_set
     ):
         del valid_directions_dict[Directions.EAST]
         del valid_directions_dict[Directions.WEST]
+    # West must be deleted
     elif not {Directions.SOUTH, Directions.WEST, Directions.NORTH}.difference(
             valid_directions_set
     ):
         del valid_directions_dict[Directions.SOUTH]
         del valid_directions_dict[Directions.NORTH]
+    # North must be deleted
     elif not {Directions.SOUTH, Directions.WEST, Directions.NORTH}.difference(
             valid_directions_set
     ):
