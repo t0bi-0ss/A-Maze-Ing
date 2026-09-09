@@ -1,4 +1,4 @@
-# Maze Generator Module (`maze_generator.py`)
+# Maze Generator Module (`mazegen.py`)
 
 ## Overview
 The `MazeGenerator` class generates and manages a maze instance with configurable generation rules. Mazes are built using the growing tree algorithm. This algorithm maintains a set of active visited cells, selects one based on a strategy, and carves a passage to an unvisited neighbor. A fixed 42 center pattern is applied to the maze when it is large enough. A collision checker ensures the entry and exit coordinates do not overlap these fixed pattern cells. 
@@ -14,7 +14,7 @@ Import the `MazeGenerator` class, create an instance, and iterate through the `g
 ```
 python
 
-from maze_generator import MazeGenerator
+from mazegen import MazeGenerator
 
 # Instantiate with default settings
 generator = MazeGenerator()
@@ -85,7 +85,7 @@ Retrieve sequence of direction characters describing a valid route from `entry` 
 ```
 python
 
-from maze_generator import path_finder
+from mazegen import path_finder
 
 # The Dijkstra pathfinder processes the generated maze data
 

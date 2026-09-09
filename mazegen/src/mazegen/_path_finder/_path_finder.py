@@ -1,6 +1,6 @@
 """Public pathfinding entry point for the maze solver."""
 
-from maze_generator import Maze
+from mazegen import Maze
 from .helper_f import select_from_unvisited, set_neighbors_distance, \
     path_to_entrance
 

@@ -9,3 +9,4 @@ dic
 dist
 .egg-info
 build
+.vscode

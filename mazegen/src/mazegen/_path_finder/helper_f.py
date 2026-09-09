@@ -2,7 +2,7 @@
 Pathfinding support functions used to compute shortest routes in the maze.
 """
 
-from maze_generator import MazeCell, Maze
+from mazegen import MazeCell, Maze
 
 from .exceptions import UnreachableCellsError
 
