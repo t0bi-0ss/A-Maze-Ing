@@ -1,0 +1,10 @@
+WIDTH=5
+height = 5
+entry = 0,0
+EXIT = 4,4
+output_file = maze.txt
+perfect:0
+hoa=ola
+#seed = 2
+algorithm = gt
+perfect_centered = 0
