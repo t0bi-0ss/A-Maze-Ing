@@ -21,14 +21,14 @@ debug:
 	python3 -m pdb $(MAIN_SCRIPT) $(CONFIG_FILE)
 
 clean:
-	find . -type d -name "__pycache__" -exec rm -rf {} +
-	rm -rf .mypy_cache
-	rm -rf poetry.lock
+	find ../. -type d -name "__pycache__" -exec rm -rf {} +
+	find ../. -type d -name ".mypy_cache" -exec rm -rf {} +
+	find ../. -type f -name "poetry.lock" -exec rm -rf {} +
 
 lint:
-	flake8 --exclude=__pycache__,.venv,maze_analyzer.py .
-	mypy . --exclude '(__pycache__|\.venv|maze_analyzer\.py)' --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+	flake8 --exclude=__pycache__,.venv,maze_analyzer.py ../.
+	mypy ../. --exclude '(__pycache__|\.venv|maze_analyzer\.py)' --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 lint-strict:
-	flake8 --ignore=0,W503,W504 --exclude=__pycache__,.venv,maze_analyzer.py .
-	mypy . --exclude '(__pycache__|\.venv|maze_analyzer\.py)' --strict
+	flake8 --ignore=0,W503,W504 --exclude=__pycache__,.venv,maze_analyzer.py ../.
+	mypy ../. --exclude '(__pycache__|\.venv|maze_analyzer\.py)' --strict
