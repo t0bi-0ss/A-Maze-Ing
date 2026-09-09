@@ -6,6 +6,7 @@ authors = [
     {name = "Tobias Sordo Ostolaza",email = "tsordo-o@student.42malaga.com"},
     {name = "Jean Roland Steven Vera Cruz",email = "jvera-cr@student.42malaga.com"}
 ]
+license = {file = "../LICENSE.md"}
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -18,3 +19,12 @@ packages = [{include = "mazegen", from = "src"}]
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.taskipy.tasks]
+clean = "rm -rf build dist *.egg-info _path_finder/*.egg-info gen_algorithms/*.egg-info"
+build = "task clean && python3 -m build --wheel && mv dist/*.whl . && task clean"
+
+[dependency-groups]
+dev = [
+    "fawltydeps (>=0.20.0,<0.21.0)"
+]

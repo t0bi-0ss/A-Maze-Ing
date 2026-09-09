@@ -12,3 +12,5 @@ pydantic_core==2.46.4
 pyflakes==3.4.0
 typing-inspection==0.4.4
 typing_extensions==4.16.0
+build==1.6.0
+taskipy==1.14.1
