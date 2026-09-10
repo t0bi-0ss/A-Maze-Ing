@@ -6,7 +6,7 @@ authors = [
     {name = "Tobias Sordo Ostolaza",email = "tsordo-o@42malaga.com"},
     {name = "Jean Roland Steven Vera Cruz",email = "jvera-cr@student.42malaga.com"}
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10"  
 dependencies = [
     "annotated-types (==0.8.0)",
     "ast-serialize (==0.8.0)",

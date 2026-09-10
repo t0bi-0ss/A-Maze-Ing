@@ -14,6 +14,10 @@ import interactive_menu
 
 import random
 
+import transcripter
+
+import parser
+
 if __name__ == "__main__":
 
     if len(sys.argv) != 2:
@@ -23,21 +27,24 @@ if __name__ == "__main__":
     # Config file name
     config_name = sys.argv[1]
 
-    maze = helper_f.load_config(config_name)
+    maze = parser.get_configurated_maze_generator(config_name)
 
     # Get generators final result
     deque(maze.generator(), maxlen=0)
 
     # Get maze solution
     solution = path_finder(
-        maze.maze, maze.ENTRY, maze.EXIT, maze.WIDTH
+        maze.maze, maze.entry, maze.exit, maze.width
     )
 
     # Get solution route
-    route = helper_f.plot_route(maze.ENTRY, solution)
+    route = helper_f.plot_route(maze.entry, solution)
+
+    # Generate first maze.txt
+    transcripter.transcripter(maze)
 
     # Initiate visualizer
-    visualizer = maze_visualizer.MazeVisualizer(route, maze.ENTRY, maze.EXIT)
+    visualizer = maze_visualizer.MazeVisualizer(route, maze.entry, maze.exit)
 
     # First rendering
     helper_f.maze_rendering(

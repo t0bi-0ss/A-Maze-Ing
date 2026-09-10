@@ -1,9 +1,9 @@
 WIDTH=10
 height = 10
 entry = 0,0
-EXIT = 4,4
+EXIT = 9,9
 output_file = maze.txt
 perfect = 0
 #seed = 2
-algorithm = gt
-perfect_centered = 1
+algorithm = backtracking
+#perfect_centered = 1

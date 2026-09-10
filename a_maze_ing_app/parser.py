@@ -1,167 +1,11 @@
 """Configuration parsing and validation utilities for the maze project."""
-
+from mazegen import MazeGenerator
 from configparser import ConfigParser, ParsingError, \
     InterpolationSyntaxError, DuplicateOptionError, DuplicateSectionError
-
-from pydantic import ValidationError, BaseModel, \
-    Field, model_validator, field_validator
-
-from typing_extensions import Self
-
-import random
+from pydantic import ValidationError
 
 
-class InvalidTerminalNodesError(Exception):
-    """Raised when a maze terminal node is invalid."""
-
-
-class MazeConfiguration(BaseModel):
-    """Validated configuration data for generating a maze."""
-
-    width: int = Field(gt=2, le=60)
-    height: int = Field(gt=2, le=60)
-    entry: tuple[int, int]
-    exit: tuple[int, int]
-    output_file: str = Field(
-        min_length=5,
-        max_length=260,
-        pattern=r"^[a-zA-Z0-9._-ñ]+$"
-    )
-    perfect: bool
-    seed: str | int | float | None = random.random()
-    algorithm: str = "gt"
-    perfect_centered: bool = True
-
-    @field_validator("width", "height", mode="before")
-    @classmethod
-    def validate_size(
-        cls,
-        input: str
-    ) -> int:
-        if isinstance(input, str):
-            try:
-                int(input)
-            except ValueError as msg:
-                raise ValueError(msg)
-            else:
-                return int(input)
-        return int(input)
-
-    @field_validator("entry", "exit", mode="before")
-    @classmethod
-    def validate_end_points(
-        cls, input: str
-    ) -> tuple[int, int]:
-
-        input_list = input.split(",")
-        for element in input_list:
-            if isinstance(element, str):
-                if len(input_list) != 2:
-                    raise ValueError(
-                        "Input must have two elements only"
-                    )
-                try:
-                    int(input_list[0])
-                    int(input_list[1])
-                except ValueError as msg:
-                    raise ValueError(msg)
-        return int(input_list[0]), int(input_list[1])
-
-    @field_validator("algorithm", mode="before")
-    @classmethod
-    def validate_algorithm(cls, input: str) -> str:
-        allowed_strings = ["prims", "backtracking", "gt"]
-        try:
-            assert input in allowed_strings
-        except AssertionError:
-            raise AssertionError(f"Allowed strings: {allowed_strings}")
-        return input
-
-    @field_validator("perfect", "perfect_centered", mode="before")
-    @classmethod
-    def validate_string_bool(cls, input: str) -> bool:
-        res = False
-        if isinstance(input, str):
-            valid_strings = {"true", "false", "yes", "no", "1", "0"}
-            if input.strip().lower() not in valid_strings:
-                raise ValueError(
-                    f"String '{input}' is not a valid boolean representation"
-                    f"\nValid strings: {valid_strings}"
-                )
-            if input in ["true", "yes", "1"]:
-                res = True
-        return res
-
-    @staticmethod
-    def validate_pos(
-        maze_width: int,
-        maze_height: int,
-        pos: tuple[int, int],
-        name: str
-    ) -> None:
-        """Validate a coordinate pair against maze boundaries.
-
-        Args:
-            maze_width: Width of the maze in cells.
-            maze_height: Height of the maze in cells.
-            pos: Position tuple to validate.
-            name: Field name used in error messages.
-
-        Raises:
-            ValueError: If the coordinate is not an integer or lies outside the
-                maze bounds.
-        """
-
-        x = pos[0]
-        y = pos[1]
-        # Check if either of it's elements exceeds maze boundaries
-        if x >= maze_height or x < 0:
-            raise ValueError(
-                f"{name} = {pos} x value is out of"
-                " bounds"
-            )
-
-        if y >= maze_width or y < 0:
-            raise ValueError(
-                f"{name} = {pos} y value is out of"
-                " bounds"
-            )
-
-    @model_validator(mode="after")
-    def validate_configuration(self) -> Self:
-        """Validate entry and exit coordinates before model creation.
-
-        Returns:
-            The validated configuration instance.
-
-        Raises:
-            ValueError: If the entry or exit cells are invalid or identical.
-        """
-
-        if self.entry == self.exit:
-            raise ValueError("Entry and exit coordinates must differ")
-        try:
-            self.validate_pos(self.width, self.height, self.exit, "EXIT")
-            self.validate_pos(self.width, self.height, self.entry, "ENTRY")
-        except ValueError as msg:
-            raise ValueError(msg)
-        return self
-
-    def __str__(self) -> str:
-        """Return a readable summary of the maze configuration."""
-
-        return f"Height: {self.height}\n" \
-            f"Width: {self.width}\n" \
-            f"Entry: {self.entry}\n" \
-            f"Exit: {self.exit}\n" \
-            f"Output file: {self.output_file}\n" \
-            f"Perfect: {self.perfect}\n" \
-            f"Seed: {self.seed}\n" \
-            f"Algorithm: {self.algorithm}\n" \
-            f"Perfect centered: {self.perfect_centered}"
-
-
-def get_config(config_file: str) -> MazeConfiguration:
+def get_configurated_maze_generator(config_file: str) -> MazeGenerator:
     """Read and validate a maze configuration from a file.
 
     Args:
@@ -196,10 +40,12 @@ def get_config(config_file: str) -> MazeConfiguration:
         raise SystemExit(msg)
 
     # Get dict of configparser options
-    config_vars = dict(parser['TOP'])
+    config_vars = {
+        key.lower(): value for key, value in dict(parser['TOP']).items()
+    }
 
     try:
-        maze_config = MazeConfiguration.model_validate(config_vars)
+        maze_generator = MazeGenerator.model_validate(config_vars)
     except KeyError as msg:
         raise SystemExit(
             f"KeyError: key {str(msg).upper()} is missing from config file"
@@ -216,4 +62,4 @@ def get_config(config_file: str) -> MazeConfiguration:
             "ERROR: invalid option " + message
         )
 
-    return maze_config
+    return maze_generator

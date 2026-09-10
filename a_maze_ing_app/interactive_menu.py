@@ -14,6 +14,8 @@ from time import sleep
 
 from collections import deque
 
+import parser
+
 
 def _visualizer_route_update(
         maze: MazeGenerator,
@@ -28,12 +30,12 @@ def _visualizer_route_update(
 
     solution = path_finder(
         maze.maze,
-        maze.ENTRY,
-        maze.EXIT,
-        maze.WIDTH
+        maze.entry,
+        maze.exit,
+        maze.width
     )
-    visualizer.start = maze.ENTRY
-    visualizer.end = maze.EXIT
+    visualizer.start = maze.entry
+    visualizer.end = maze.exit
     route = helper_f.plot_route(visualizer.start, solution)
     visualizer.full_route = route
 
@@ -52,9 +54,9 @@ def interactive_menu(
     animation_toggle = False
     original = 1
     original_seed = maze.seed
-    original_selector = maze.SELECTOR
+    original_selector = maze.selector
 
-    match maze.SELECTOR:
+    match maze.selector:
         case 0:
             current_algorithm = "Backtracking"
         case 1:
@@ -148,7 +150,7 @@ def interactive_menu(
                 else:
                     original = 1
                     maze.seed = original_seed
-                    maze.SELECTOR = original_selector
+                    maze.selector = original_selector
                     helper_f.regenerate_maze(
                         maze=maze
                     )
@@ -166,7 +168,7 @@ def interactive_menu(
                     visualizer=visualizer,
                 )
             case "8":  # Re-load config
-                maze = helper_f.load_config(sys.argv[1])
+                maze = parser.get_configurated_maze_generator(sys.argv[1])
                 deque(maze.generator(), maxlen=0)
                 # helper_f.maze_rendering(
                 #     maze=maze,
@@ -204,11 +206,11 @@ def interactive_menu(
                         else:
                             match algo_choice:
                                 case "1":
-                                    maze.SELECTOR = 1
+                                    maze.selector = 1
                                 case "2":
-                                    maze.SELECTOR = 0
+                                    maze.selector = 0
                                 case "3":
-                                    maze.SELECTOR = -1
+                                    maze.selector = -1
                                 case _:
                                     print(
                                         "Error: unrecognized selection. "
@@ -216,7 +218,7 @@ def interactive_menu(
                                     )
                                     sleep(1)
                                     continue
-                            match maze.SELECTOR:
+                            match maze.selector:
                                 case 0:
                                     current_algorithm = "Backtracking"
                                 case 1:

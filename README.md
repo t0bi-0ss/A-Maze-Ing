@@ -83,6 +83,7 @@ keep the project environment clean:**
 ```bash
 make clean
 ```
+ ⚠️ Important: It is highly recommended to keep the original file and folder structure intact. The project relies on relative paths to connect its components, so moving any element could break references and cause runtime errors.
 
 #### 🛠️ Alternative with Poetry
 Alternatively, the `make install` and `make run` workflows have been automated using **Python Poetry**, a modern tool for dependency management and Python project packaging:
@@ -145,7 +146,7 @@ We also have 3 additional keys:
 ```ini
 SEED=12345             # Seed for reproducible generation (optional)
 ALGORITHM=gt           # Generation algorithm (prim, backtracking, gt)
-PERFECT_CENTERED=True  # Forces exact centering of the "42" logo or raises a controlled error
+PERFECT_CENTERED=True  # Forces exact centering of the "42" logo or raises a controlled error. For default this value is True.
 ```
 
 ℹ️ **Note:** The configuration parser is highly flexible and includes the following features:
@@ -154,6 +155,7 @@ PERFECT_CENTERED=True  # Forces exact centering of the "42" logo or raises a con
 * **Case Insensitivity:** Keys are **case-insensitive**, meaning `WIDTH`, `width`, and `Width` are all recognized as the exact same configuration key.
 * **Comment Lines:** Comments can only be placed on standalone lines and must start with either a hash character (`#`) or a semicolon (`;`) as the **leading** character. Inline or trailing comments after a key-value pair are not allowed.
 * **Whitespace Robustness:** It automatically strips any **leading** or **trailing** whitespace from both keys and values, preventing accidental parsing errors.
+* **Maze Display Rule**: If the PERFECT_CENTERED flag is disabled, the maze will not be displayed by default unless specific parameters are provided to achieve a perfect center alignment.
 
 Therefore, the following formats are completely valid:
 

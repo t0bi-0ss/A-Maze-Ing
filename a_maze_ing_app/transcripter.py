@@ -22,7 +22,7 @@ def transcripter(maze: MazeGenerator) -> None:
 
     for cell in maze.maze:
         res += to_hex(cell.walls)
-        if counter == maze.WIDTH and cell != maze.maze[-1]:
+        if counter == maze.width and cell != maze.maze[-1]:
             counter = 1
             res += "\n"
             continue
@@ -30,20 +30,20 @@ def transcripter(maze: MazeGenerator) -> None:
 
     # Pass entry and exit
     res += "\n\n"
-    res += f"{maze.ENTRY}\n"
-    res += f"{maze.EXIT}\n"
+    res += f"{maze.entry}\n"
+    res += f"{maze.exit}\n"
 
     # Pass solution
     solution = path_finder(
         maze.maze,
-        maze.ENTRY,
-        maze.EXIT,
-        maze.WIDTH
+        maze.entry,
+        maze.exit,
+        maze.width
     )
     res += solution
 
     try:
-        with open(maze.OUTPUT_FILE, 'w') as f:
+        with open(maze.output_file, 'w') as f:
             f.write(res)
     except (
             UnicodeDecodeError,
@@ -56,5 +56,5 @@ def transcripter(maze: MazeGenerator) -> None:
         print(msg)
         sys.exit()
     else:
-        print(f'Content saved to "{maze.OUTPUT_FILE}"')
+        print(f'Content saved to "{maze.output_file}"')
         sleep(2)

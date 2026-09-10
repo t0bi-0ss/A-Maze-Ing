@@ -7,7 +7,6 @@ import maze_visualizer
 import mazegen
 import random
 from time import sleep
-import parser
 import sys
 from collections import deque
 
@@ -128,7 +127,7 @@ def maze_rendering(
                 print("\033[H", end="")
                 visualizer.renderize(
                     maze=maze.maze,
-                    width=maze.WIDTH
+                    width=maze.width
                 )
                 sleep(.05)
         except KeyboardInterrupt:
@@ -140,7 +139,7 @@ def maze_rendering(
         print("\033[H", end="")
         visualizer.renderize(
             maze=maze.maze,
-            width=maze.WIDTH
+            width=maze.width
         )
 
 
@@ -165,39 +164,6 @@ def define_selector(algorithm: str) -> int:
     return res
 
 
-def load_config(
-        file_name: str
-) -> mazegen.MazeGenerator:
-    """Build a maze generator from a configuration file.
-
-    Args:
-        file_name: Path to the maze configuration file.
-
-    Returns:
-        A configured ``MazeGenerator`` instance.
-    """
-
-    try:
-        # Get configuration
-        configuration = parser.get_config(file_name)
-    except SystemExit as msg:
-        print(msg)
-        sys.exit()
-    else:
-        maze = mazegen.MazeGenerator(
-            width=configuration.width,
-            height=configuration.height,
-            entry=configuration.entry,
-            exit=configuration.exit,
-            perfect=configuration.perfect,
-            seed=configuration.seed,
-            perfect_centered=configuration.perfect_centered,
-            selector=define_selector(configuration.algorithm),
-            output_file=configuration.output_file
-        )
-    return maze
-
-
 def regenerate_maze(
         maze: mazegen.MazeGenerator,
         new_maze: bool = False
@@ -213,7 +179,7 @@ def regenerate_maze(
     # Restart maze
     maze.maze = [
         mazegen.MazeCell(element_num) for element_num
-        in range(0, maze.WIDTH * maze.HEIGHT)
+        in range(0, maze.width * maze.height)
     ]
 
     # Restart rng
@@ -222,18 +188,18 @@ def regenerate_maze(
     # Set pattern
     mazegen.pattern(
         maze.maze,
-        maze.WIDTH,
-        maze.HEIGHT,
-        maze.PCENTERED,
+        maze.width,
+        maze.height,
+        maze.pcentered,
         maze.rng
     )
 
     # Check for colition
     mazegen.colition_checker(
         maze.maze,
-        maze.ENTRY,
-        maze.EXIT,
-        maze.WIDTH
+        maze.entry,
+        maze.exit,
+        maze.width
     )
 
     # Restart generator
