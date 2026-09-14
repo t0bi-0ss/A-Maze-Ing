@@ -34,6 +34,8 @@
 
 # $\color{red}{ꡙ‍}$ A-Maze-ing
 
+![](https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXdvc3hoZ2liNXcwam91aWxyMnF1eWp1M2I2dTNjZjF5c3NvZ2YxdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PmciRBZCBWJRwy1ZYS/giphy.gif)
+
 ## 📝 Description
 
 **A-Maze-ing** is a random maze generator and viewer developed in Python.
