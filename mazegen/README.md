@@ -1,7 +1,7 @@
 # Maze Generator Module (`mazegen.py`)
 
 ## Overview
-The `MazeGenerator` class generates and manages a maze instance with configurable generation rules. Mazes are built using the growing tree algorithm. This algorithm maintains a set of active visited cells, selects one based on a strategy, and carves a passage to an unvisited neighbor. A fixed 42 center pattern is applied to the maze when it is large enough. A collision checker ensures the entry and exit coordinates do not overlap these fixed pattern cells. 
+The `MazeGenerator` class generates and manages a maze instance with configurable generation rules. It supports the growing tree (`gt`), recursive backtracking, and Prim's algorithms. These algorithms maintain active visited cells, select a cell according to their strategy, and carve passages to unvisited neighbors. A fixed 42 center pattern is applied to the maze when it is large enough. A collision checker ensures the entry and exit coordinates do not overlap these fixed pattern cells.
 
 By default, imperfect mazes are created by running `open_dead_end_passage()` after the initial generation. This function searches for dead ends (cells with 3 walls) and attempts to delete the middle wall; if impossible, it randomly deletes one of the remaining two side walls. Path solutions are computed using a Dijkstra implementation.
 
@@ -9,10 +9,11 @@ By default, imperfect mazes are created by running `open_dead_end_passage()` aft
 
 ## 1. Instantiation and Basic Usage
 
-Import the `MazeGenerator` class, create an instance, and iterate through the `gen_maze()` generator to process the maze generation steps.
+Import `MazeGenerator`, create a validated configuration, and iterate through
+`gen_maze()` to complete generation. The generator yields the current maze
+state after each generation step, so it can also be used to visualize progress.
 
-```
-python
+```python
 
 from mazegen import MazeGenerator
 
@@ -26,26 +27,29 @@ for state in generator.gen_maze():
 
 ---
 
-## 2. Custom Parameters
+## 2. Configuration Parameters
 
-Pass custom parameters during initialization to control grid dimensions, start/end positions, and random seeding.
+Pass custom parameters during initialization. Pydantic validates the
+configuration before the maze is created: `width` and `height` must be between
+3 and 60, and `entry` and `exit` must be different coordinates inside the
+maze. Coordinates use `(row, column)` order.
 
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `width` | `int` | `3` | Maze width in cells. |
-| `height` | `int` | `3` | Maze width in cells. |
-| `seed` | `int` / `None` | `None` | Seed for reproducible generation. |
-| `start` | `tuple(int, int)` | `(0, 0)` | Starting coordinate `(row, col)`. |
-| `end` | `tuple(int, int)` | `(2, 2)` | Ending coordinate `(row, col)`. |
-| `selector` | `float` | `-1` | Growth strategy selector for the generator. |
-| `perfect` | `bool` | `False` | Wether to keep the maze fully perfect. |
-| `seed` | `any` | `None` | Random seed for reproducible generation. |
-| `perfect_centered` | `bool` | `True` | Whether the fixed center pattern should stay centered. |
-| `output_file` | `str` | `maze.txt` | File path used when exporting the maze. |
+| `height` | `int` | `3` | Maze height in cells. |
+| `entry` | `tuple[int, int]` | `(0, 0)` | Entrance coordinate `(row, column)`. |
+| `exit` | `tuple[int, int]` | `(2, 2)` | Exit coordinate `(row, column)`. |
+| `output_file` | `str` | `maze.txt` | Output filename configuration, 5-260 characters. |
+| `perfect` | `bool` | `False` | Keep the generated maze perfect when `True`; otherwise open dead ends. |
+| `seed` | `str \| int \| float \| None` | random value | Seed used for reproducible generation. |
+| `algorithm` | `str` | `gt` | Generation algorithm: `gt`, `backtracking`, or `prims`. |
+| `pcentered` | `bool` | `True` | Keep the fixed center pattern centered when it is applied. |
 
+Boolean options also accept the strings `true`, `false`, `yes`, `no`, `1`, and `0`.
+Calling `str(generator)` returns a readable summary of the validated configuration.
 
-```
-python
+```python
 
 # Custom configuration
 
@@ -55,7 +59,9 @@ generator = MazeGenerator(
     entry=(0, 0),
     exit=(19, 14),
     perfect=True,
-    seed=42
+    seed=42,
+    algorithm="backtracking",
+    pcentered=False
 )
 for state in generator.gen_maze():
     pass
@@ -66,10 +72,12 @@ for state in generator.gen_maze():
 ## 3. Accessing Structure and Solution
 
 ### Access the Grid Structure
-The generated maze is accessible via the maze attribute as a flat, row-major list of MazeCell objects[cite: 1]. Each cell utilizes a bitmask (walls = 15) for its wall configuration. Walls are removed using bitwise XOR operations (1=North, 2=East, 4=South, 8=West).
+After generation, `generator.maze` contains a flat, row-major list of
+`MazeCell` objects. Each cell starts with all four walls (`walls = 15`) and
+uses a bitmask for its current walls: `1` north, `2` east, `4` south, and `8`
+west. The `static` flag identifies cells belonging to the fixed center pattern.
 
-```
-python
+```python
 
 # Access the list of MazeCell objects
 
@@ -80,16 +88,15 @@ for cell in maze_data:
 ```
 
 ### Access the Solution
-Retrieve sequence of direction characters describing a valid route from `entry` to `exit` by applying the external Dijkstra pathfinder implementation to the generated maze structure.
+Use the exported Dijkstra pathfinder after generation. It returns a string of
+direction characters describing a route from `entry` to `exit`.
 
-```
-python
+```python
 
 from mazegen import path_finder
 
-# The Dijkstra pathfinder processes the generated maze data
-
-path = path_finder(generator.maze, generator.ENTRY, generator.EXIT, generator.width)
+# The pathfinder expects the generated cells, both coordinates, and maze width
+path = path_finder(generator.maze, generator.entry, generator.exit, generator.width)
 print("Path from entry to exit:")
 print(path)
 ```

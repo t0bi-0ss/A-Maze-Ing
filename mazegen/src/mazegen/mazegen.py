@@ -233,12 +233,12 @@ class MazeGenerator(BaseModel):
     def __str__(self) -> str:
         """Return a readable summary of the maze configuration."""
 
-        return f"HEIGHT: {self.height}\n" \
+        return f"Height: {self.height}\n" \
             f"Width: {self.width}\n" \
-            f"ENTRY: {self.entry}\n" \
+            f"Entry: {self.entry}\n" \
             f"Exit: {self.exit}\n" \
             f"Output file: {self.output_file}\n" \
-            f"PERFECT: {self.perfect}\n" \
+            f"Perfect: {self.perfect}\n" \
             f"Seed: {self.seed}\n" \
             f"Algorithm: {self.algorithm}\n" \
-            f"PERFECT centered: {self.pcentered}"
+            f"Perfect centered: {self.pcentered}"
